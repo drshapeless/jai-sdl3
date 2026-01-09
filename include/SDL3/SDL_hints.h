@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -1095,7 +1095,7 @@ extern "C" {
  *
  * This hint should be set before SDL is initialized.
  *
- * \since This hint is available since SDL 3.4.0.
+ * \since This hint is available since SDL 3.2.0.
  */
 #define SDL_HINT_HIDAPI_LIBUSB_GAMECUBE "SDL_HIDAPI_LIBUSB_GAMECUBE"
 
@@ -1778,16 +1778,10 @@ extern "C" {
  * A variable controlling whether the HIDAPI driver for HORI licensed Steam
  * controllers should be used.
  *
- * The variable can be set to the following values:
+ * This variable can be set to the following values: "0" - HIDAPI driver is
+ * not used "1" - HIDAPI driver is used
  *
- * - "0": HIDAPI driver is not used.
- * - "1": HIDAPI driver is used.
- *
- * The default is the value of SDL_HINT_JOYSTICK_HIDAPI.
- *
- * This hint should be set before initializing joysticks and gamepads.
- *
- * \since This hint is available since SDL 3.2.0.
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
 #define SDL_HINT_JOYSTICK_HIDAPI_STEAM_HORI "SDL_JOYSTICK_HIDAPI_STEAM_HORI"
 
@@ -1795,16 +1789,12 @@ extern "C" {
  * A variable controlling whether the HIDAPI driver for some Logitech wheels
  * should be used.
  *
- * The variable can be set to the following values:
+ * This variable can be set to the following values:
  *
- * - "0": HIDAPI driver is not used.
- * - "1": HIDAPI driver is used.
+ * - "0": HIDAPI driver is not used
+ * - "1": HIDAPI driver is used
  *
- * The default is the value of SDL_HINT_JOYSTICK_HIDAPI.
- *
- * This hint should be set before initializing joysticks and gamepads.
- *
- * \since This hint is available since SDL 3.4.0.
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
 #define SDL_HINT_JOYSTICK_HIDAPI_LG4FF "SDL_JOYSTICK_HIDAPI_LG4FF"
 
@@ -1812,16 +1802,11 @@ extern "C" {
  * A variable controlling whether the HIDAPI driver for 8BitDo controllers
  * should be used.
  *
- * The variable can be set to the following values:
+ * This variable can be set to the following values:
  *
- * - "0": HIDAPI driver is not used.
- * - "1": HIDAPI driver is used.
+ * "0" - HIDAPI driver is not used. "1" - HIDAPI driver is used.
  *
- * The default is the value of SDL_HINT_JOYSTICK_HIDAPI.
- *
- * This hint should be set before initializing joysticks and gamepads.
- *
- * \since This hint is available since SDL 3.4.0.
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
 #define SDL_HINT_JOYSTICK_HIDAPI_8BITDO "SDL_JOYSTICK_HIDAPI_8BITDO"
 
@@ -1831,16 +1816,11 @@ extern "C" {
  *
  * More info - https://github.com/HandHeldLegend/SInput-HID
  *
- * The variable can be set to the following values:
+ * This variable can be set to the following values:
  *
- * - "0": HIDAPI driver is not used.
- * - "1": HIDAPI driver is used.
+ * "0" - HIDAPI driver is not used. "1" - HIDAPI driver is used.
  *
- * The default is the value of SDL_HINT_JOYSTICK_HIDAPI.
- *
- * This hint should be set before initializing joysticks and gamepads.
- *
- * \since This hint is available since SDL 3.4.0.
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
 #define SDL_HINT_JOYSTICK_HIDAPI_SINPUT "SDL_JOYSTICK_HIDAPI_SINPUT"
 
@@ -1848,16 +1828,11 @@ extern "C" {
  * A variable controlling whether the HIDAPI driver for ZUIKI controllers
  * should be used.
  *
- * The variable can be set to the following values:
+ * This variable can be set to the following values:
  *
- * - "0": HIDAPI driver is not used.
- * - "1": HIDAPI driver is used.
+ * "0" - HIDAPI driver is not used. "1" - HIDAPI driver is used.
  *
- * The default is the value of SDL_HINT_JOYSTICK_HIDAPI.
- *
- * This hint should be set before initializing joysticks and gamepads.
- *
- * \since This hint is available since SDL 3.4.0.
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
 #define SDL_HINT_JOYSTICK_HIDAPI_ZUIKI "SDL_JOYSTICK_HIDAPI_ZUIKI"
 
@@ -1865,16 +1840,11 @@ extern "C" {
  * A variable controlling whether the HIDAPI driver for Flydigi controllers
  * should be used.
  *
- * The variable can be set to the following values:
+ * This variable can be set to the following values:
  *
- * - "0": HIDAPI driver is not used.
- * - "1": HIDAPI driver is used.
+ * "0" - HIDAPI driver is not used. "1" - HIDAPI driver is used.
  *
- * The default is the value of SDL_HINT_JOYSTICK_HIDAPI.
- *
- * This hint should be set before initializing joysticks and gamepads.
- *
- * \since This hint is available since SDL 3.4.0.
+ * The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
 #define SDL_HINT_JOYSTICK_HIDAPI_FLYDIGI "SDL_JOYSTICK_HIDAPI_FLYDIGI"
 
@@ -3330,45 +3300,33 @@ extern "C" {
 #define SDL_HINT_ROG_GAMEPAD_MICE_EXCLUDED "SDL_ROG_GAMEPAD_MICE_EXCLUDED"
 
 /**
- * A variable controlling the width of the PS2's framebuffer in pixels.
+ * Variable controlling the width of the PS2's framebuffer in pixels
  *
- * By default, the variable is "640".
- *
- * \since This hint is available since SDL 3.4.0.
+ * By default, this variable is "640"
  */
 #define SDL_HINT_PS2_GS_WIDTH    "SDL_PS2_GS_WIDTH"
 
 /**
- * A variable controlling the height of the PS2's framebuffer in pixels.
+ * Variable controlling the height of the PS2's framebuffer in pixels
  *
- * By default, the variable is "448".
- *
- * \since This hint is available since SDL 3.4.0.
+ * By default, this variable is "448"
  */
 #define SDL_HINT_PS2_GS_HEIGHT    "SDL_PS2_GS_HEIGHT"
 
 /**
- * A variable controlling whether the signal is interlaced or progressive.
- *
- * The variable can be set to the following values:
+ * Variable controlling whether the signal is interlaced or progressive
  *
  * - "0": Image is interlaced. (default)
- * - "1": Image is progressive.
- *
- * \since This hint is available since SDL 3.4.0.
+ * - "1": Image is progressive
  */
 #define SDL_HINT_PS2_GS_PROGRESSIVE    "SDL_PS2_GS_PROGRESSIVE"
 
 /**
- * A variable controlling the video mode of the console.
- *
- * The variable can be set to the following values:
+ * Variable controlling the video mode of the console
  *
  * - "": Console-native. (default)
- * - "NTSC": 60hz region.
- * - "PAL": 50hz region.
- *
- * \since This hint is available since SDL 3.4.0.
+ * - "NTSC": 60hz region
+ * - "PAL": 50hz region
  */
 #define SDL_HINT_PS2_GS_MODE    "SDL_PS2_GS_MODE"
 
@@ -4808,8 +4766,7 @@ extern SDL_DECLSPEC bool SDLCALL SDL_GetHintBoolean(const char *name, bool defau
  * A callback used to send notifications of hint value changes.
  *
  * This is called an initial time during SDL_AddHintCallback with the hint's
- * current value, and then again each time the hint's value changes. In the
- * initial call, the current value is in both `oldValue` and `newValue`.
+ * current value, and then again each time the hint's value changes.
  *
  * \param userdata what was passed as `userdata` to SDL_AddHintCallback().
  * \param name what was passed as `name` to SDL_AddHintCallback().
