@@ -1,14 +1,15 @@
-#run build();
+vulkan := false;
+image  := false;
+ttf    := false;
 
-vulkan_support := false;
-
-build :: () {
-
+#run {
     set_build_options_dc(.{do_output=false});
 
     options := get_build_options();
     args := options.compile_time_command_line;
-    vulkan_support = array_find(args, "-vulkan");
+    vulkan = array_find(args, "vulkan");
+    image  = array_find(args, "image");
+    ttf    = array_find(args, "ttf");
 
     if !generate_bindings() {
         compiler_set_workspace_status(.FAILED);
@@ -17,92 +18,89 @@ build :: () {
 }
 
 generate_bindings :: () -> bool {
-
     output_filename: string;
     opts: Generate_Bindings_Options;
+    opts.strip_flags = .FUNCTIONS_WITH_VALIST;
 
-    {
-        #if OS == .WINDOWS {
+    #if OS == .LINUX {
+        output_filename = "linux/linux.jai";
 
-            output_filename = "windows/windows.jai";
-            opts.strip_flags = .FUNCTIONS_WITH_VALIST;
-
-            FOOTER :: #string EOF
-#if CPU == .X64 {
-    sdl3 :: #library,no_dll "bin/x64/SDL3";
-} else #if CPU == .ARM64 {
-    sdl3 :: #library,no_dll "bin/arm64/SDL3";
-}
-EOF
-            // DLL provided by user not in bin, so use our own footer not generated library declaration
-            opts.footer = FOOTER;
-            opts.generate_library_declarations = false;
-
-            #if CPU == .X64 {
-                array_add(*opts.library_search_paths, "windows/bin/x64");
-            } else #if CPU == .ARM64 {
-                array_add(*opts.library_search_paths, "windows/bin/arm64");
-            } else {
-                assert(false, "the CPU % is currently unsupported. You might be able to add support for it though!", CPU);
-            }
-
-            array_add(*opts.libraries, .{filename="SDL3"});
-
-        } else #if OS == .LINUX {
-            opts.strip_flags = .FUNCTIONS_WITH_VALIST;
-
-            output_filename = "linux/linux.jai";
-
-            FOOTER :: #string EOF
+        FOOTER :: #string EOF
 libsdl3 :: #library,system "libSDL3.so.0";
 EOF;
-            opts.footer = FOOTER;
-            opts.generate_library_declarations = false;
-
-            array_add(*opts.libraries, .{filename="libSDL3.so.0"});
-
-        } else #if OS == .MACOS {
-
-            output_filename = "macos/macos.jai";
-            opts.strip_flags = .FUNCTIONS_WITH_VALIST;
-
-            FOOTER :: #string EOF
-#if CPU == .X64 {
-    libsdl3 :: #library "bin/x64/libSDL3.0_dynamic";
-} else #if CPU == .ARM64 {
-    libsdl3 :: #library "bin/arm64/libSDL3.0_dynamic";
-}
+        FOOTER_IMAGE :: #string EOF
+libsdl3_image :: #library,system "libSDL3_image.so.0";
 EOF;
-            #if CPU == .X64 {
-                array_add(*opts.library_search_paths, "macos/bin/x64");
-            } else #if CPU == .ARM64 {
-                array_add(*opts.library_search_paths, "macos/bin/arm64");
-            } else {
-                assert(false, "the CPU % is currently unsupported. You might be able to add support for it though!", CPU);
-            }
+        FOOTER_TTF   :: #string EOF
+libsdl3_ttf :: #library,system "libSDL3_ttf.so.0";
+EOF;
 
-            opts.footer = FOOTER;
-            opts.generate_library_declarations = false;
+        opts.footer = FOOTER;
 
-            // We need the .a to bind but .dylib is used in runtime.
-            array_add(*opts.libraries, .{filename="libSDL3.0"});
-        } else {
-            assert(false, "the OS % is currently unsupported. You might be able to add support for it though!", OS);
+        if image {
+            opts.footer = sprint("%%", opts.footer, FOOTER_IMAGE);
         }
 
-        array_add(*opts.include_paths, "include");
-        array_add(*opts.source_files, "include/SDL3/SDL.h");
-        array_add(*opts.source_files, "include/SDL3/SDL_main.h");
-        if vulkan_support {
-            array_add(*opts.source_files, "include/SDL3/SDL_vulkan.h");
-            opts.footer = sprint("#import \"Vulkan\";\n%", opts.footer);
+        if ttf {
+            opts.footer = sprint("%%", opts.footer, FOOTER_TTF);
         }
 
-        // array_add(*strip_prefixes, "");
+        opts.generate_library_declarations = false;
 
-        opts.visitor = sdl3_visitor;
-        opts.generate_compile_time_struct_checks = false;
+        array_add(*opts.libraries, .{filename="libSDL3.so.0"});
+        array_add(*opts.libraries, .{filename="libSDL3_image.so.0"});
+        array_add(*opts.libraries, .{filename="libSDL3_ttf.so.0"});
+    } else #if OS == .MACOS {
+        output_filename = "macos/macos.jai";
+
+        FOOTER :: #string EOF
+libsdl3 :: #library,system "libSDL3";
+EOF;
+        FOOTER_IMAGE :: #string EOF
+libsdl3_image :: #library,system "libSDL3_image";
+EOF;
+        FOOTER_TTF   :: #string EOF
+libsdl3_ttf :: #library,system "libSDL3_ttf";
+EOF;
+
+        array_add(*opts.library_search_paths, "/opt/homebrew/lib");
+
+        opts.footer = FOOTER;
+
+        if image {
+            opts.footer = sprint("%%", opts.footer, FOOTER_IMAGE);
+        }
+
+        if ttf {
+            opts.footer = sprint("%%", opts.footer, FOOTER_TTF);
+        }
+
+        opts.generate_library_declarations = false;
+        array_add(*opts.libraries, .{filename = "libSDL3"});
+        array_add(*opts.libraries, .{filename = "libSDL3_image"});
+        array_add(*opts.libraries, .{filename = "libSDL3_ttf"});
+    } else {
+        assert(false, "the OS % is currently unsupported. You might be able to add support for it though!", OS);
     }
+
+    array_add(*opts.include_paths, "include");
+    array_add(*opts.source_files, "include/SDL3/SDL.h");
+    array_add(*opts.source_files, "include/SDL3/SDL_main.h");
+    if ttf {
+        array_add(*opts.source_files, "include/SDL3_ttf/SDL_ttf.h");
+    }
+
+    if image {
+        array_add(*opts.source_files, "include/SDL3_image/SDL_image.h");
+    }
+
+    if vulkan {
+        array_add(*opts.source_files, "include/SDL3/SDL_vulkan.h");
+        opts.footer = sprint("#import \"Vulkan\";\n%", opts.footer);
+    }
+
+    opts.visitor = sdl3_visitor;
+    opts.generate_compile_time_struct_checks = false;
 
     return generate_bindings(opts, output_filename);
 }
@@ -113,7 +111,7 @@ sdl3_visitor :: (decl: *Declaration, parent_decl: *Declaration) -> Declaration_V
 
     // if parent_decl return .RECURSE;
 
-    if vulkan_support {
+    if vulkan {
         if begins_with(decl.name, "Vk") {
             decl.decl_flags |= .OMIT_FROM_OUTPUT;
             return .STOP;

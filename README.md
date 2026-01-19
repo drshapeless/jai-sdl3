@@ -6,23 +6,15 @@ These bindings are 'pure', we don't add or change the interface to SDL3.
 
 ## Installation
 
+Caution, window support is temporarily dropped since I don't have a Window machine to test.
+
 Copy this into your modules folder, then:
 
 - **Windows**: Put the proper (x64/arm64) DLL next to your executable and make sure its called `SDL3.dll`. Prebuilt DLLs [here](https://github.com/overlord-systems/jai-sdl3/releases/tag/v1.2_3.2.14).
 - **Linux**: Ensure SDL3 binaries are installed on your system (thanks to @marvhus).
-- **MacOS**: Place the `x86/arm64` dynamic library (download from [here](https://github.com/overlord-systems/jai-sdl3/releases/tag/v1.2_3.2.14)) next to your executable and make sure its called `libSDL3.0.dylib` (thanks to @4iwen).
+- **MacOS**: If you are using homebrew, make sure you have installed SDL3 its related libaries. No binary is needed to be provided anymore. Currently it does not support generation outside homebrew.
 
 SDL supports a ton of platforms, so adding support for things like Android/iOS/etc should be possible.
-
-### MacOS Note
-
-On (some?) MacOS machines the generater **requires** a `.a` static library (it can't generate bindings from a dylib, we get weird errors), but compiling a jai program fails if we try to link to that same `.a` library.
-
-As such, we run the generator on the bundled `.a`, but the bindings link to the bundled `libSDL3.0_dynamic.dylib` and you are required to have `libSDL3.0.dylib` next to your executable.
-
-The reason we do this is to ensure jai uses the dynamic library when compiling. If we simply places `.a` and `.dylib` with the same name in one folder, jai will always pick the `.a` static library and compilation will fail.
-
-What the source of this mess is, and whether it will improve, is to be seen.
 
 ## Callbacks API
 
@@ -48,7 +40,15 @@ Vulkan is supported, but you have to import a Vulkan binding on your own. You ca
 The vulkan support is default to be off. You can generate a binding with vulkan using command line args.
 
 ```
-jai generate.jai - -vulkan
+jai generate.jai - vulkan
+```
+
+## SDL modules support
+
+SDL_image and SDL_ttf is supported via flags.
+
+```
+jai generate.jai - image ttf
 ```
 
 ## Contribution
