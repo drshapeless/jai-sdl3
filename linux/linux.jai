@@ -1,7 +1,7 @@
 //
 // This file was auto-generated using the following command:
 //
-// jai generate.jai
+// jai generate.jai - vulkan image ttf
 //
 
 
@@ -1390,6 +1390,57 @@ SDL_MAJOR_VERSION :: 3;
 SDL_MINOR_VERSION :: 4;
 
 SDL_MICRO_VERSION :: 0;
+
+SDL_TTF_MAJOR_VERSION :: 3;
+SDL_TTF_MINOR_VERSION :: 2;
+SDL_TTF_MICRO_VERSION :: 2;
+
+TTF_PROP_FONT_CREATE_FILENAME_STRING :: "SDL_ttf.font.create.filename";
+TTF_PROP_FONT_CREATE_IOSTREAM_POINTER :: "SDL_ttf.font.create.iostream";
+TTF_PROP_FONT_CREATE_IOSTREAM_OFFSET_NUMBER :: "SDL_ttf.font.create.iostream.offset";
+TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN :: "SDL_ttf.font.create.iostream.autoclose";
+TTF_PROP_FONT_CREATE_SIZE_FLOAT :: "SDL_ttf.font.create.size";
+TTF_PROP_FONT_CREATE_FACE_NUMBER :: "SDL_ttf.font.create.face";
+TTF_PROP_FONT_CREATE_HORIZONTAL_DPI_NUMBER :: "SDL_ttf.font.create.hdpi";
+TTF_PROP_FONT_CREATE_VERTICAL_DPI_NUMBER :: "SDL_ttf.font.create.vdpi";
+TTF_PROP_FONT_CREATE_EXISTING_FONT :: "SDL_ttf.font.create.existing_font";
+
+TTF_PROP_FONT_OUTLINE_LINE_CAP_NUMBER :: "SDL_ttf.font.outline.line_cap";
+TTF_PROP_FONT_OUTLINE_LINE_JOIN_NUMBER :: "SDL_ttf.font.outline.line_join";
+TTF_PROP_FONT_OUTLINE_MITER_LIMIT_NUMBER :: "SDL_ttf.font.outline.miter_limit";
+
+TTF_STYLE_NORMAL :: 0x00;
+TTF_STYLE_BOLD :: 0x01;
+TTF_STYLE_ITALIC :: 0x02;
+TTF_STYLE_UNDERLINE :: 0x04;
+TTF_STYLE_STRIKETHROUGH :: 0x08;
+
+TTF_FONT_WEIGHT_THIN :: 100;
+TTF_FONT_WEIGHT_EXTRA_LIGHT :: 200;
+TTF_FONT_WEIGHT_LIGHT :: 300;
+TTF_FONT_WEIGHT_NORMAL :: 400;
+TTF_FONT_WEIGHT_MEDIUM :: 500;
+TTF_FONT_WEIGHT_SEMI_BOLD :: 600;
+TTF_FONT_WEIGHT_BOLD :: 700;
+TTF_FONT_WEIGHT_EXTRA_BOLD :: 800;
+TTF_FONT_WEIGHT_BLACK :: 900;
+TTF_FONT_WEIGHT_EXTRA_BLACK :: 950;
+
+TTF_PROP_RENDERER_TEXT_ENGINE_RENDERER :: "SDL_ttf.renderer_text_engine.create.renderer";
+TTF_PROP_RENDERER_TEXT_ENGINE_ATLAS_TEXTURE_SIZE :: "SDL_ttf.renderer_text_engine.create.atlas_texture_size";
+
+TTF_PROP_GPU_TEXT_ENGINE_DEVICE :: "SDL_ttf.gpu_text_engine.create.device";
+TTF_PROP_GPU_TEXT_ENGINE_ATLAS_TEXTURE_SIZE :: "SDL_ttf.gpu_text_engine.create.atlas_texture_size";
+
+TTF_SUBSTRING_DIRECTION_MASK :: 0x000000FF;
+TTF_SUBSTRING_TEXT_START :: 0x00000100;
+TTF_SUBSTRING_LINE_START :: 0x00000200;
+TTF_SUBSTRING_LINE_END :: 0x00000400;
+TTF_SUBSTRING_TEXT_END :: 0x00000800;
+
+SDL_IMAGE_MAJOR_VERSION :: 3;
+SDL_IMAGE_MINOR_VERSION :: 2;
+SDL_IMAGE_MICRO_VERSION :: 4;
 
 /**
 * A signed 8-bit integer type.
@@ -38160,8 +38211,4949 @@ SDL_EnterAppMainCallbacks :: (argc: s32, argv: **u8, appinit: SDL_AppInit_func, 
 */
 SDL_GDKSuspendComplete :: () -> void #foreign libsdl3;
 
+/**
+* This function gets the version of the dynamically linked SDL_ttf library.
+*
+* \returns SDL_ttf version.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_Version :: () -> s32 #foreign libsdl3_ttf;
+
+/**
+* Query the version of the FreeType library in use.
+*
+* TTF_Init() should be called before calling this function.
+*
+* \param major to be filled in with the major version number. Can be NULL.
+* \param minor to be filled in with the minor version number. Can be NULL.
+* \param patch to be filled in with the param version number. Can be NULL.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_Init
+*/
+TTF_GetFreeTypeVersion :: (major: *s32, minor: *s32, patch: *s32) -> void #foreign libsdl3_ttf;
+
+/**
+* Query the version of the HarfBuzz library in use.
+*
+* If HarfBuzz is not available, the version reported is 0.0.0.
+*
+* \param major to be filled in with the major version number. Can be NULL.
+* \param minor to be filled in with the minor version number. Can be NULL.
+* \param patch to be filled in with the param version number. Can be NULL.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetHarfBuzzVersion :: (major: *s32, minor: *s32, patch: *s32) -> void #foreign libsdl3_ttf;
+
+TTF_Font :: struct {}
+
+/**
+* Initialize SDL_ttf.
+*
+* You must successfully call this function before it is safe to call any
+* other function in this library.
+*
+* It is safe to call this more than once, and each successful TTF_Init() call
+* should be paired with a matching TTF_Quit() call.
+*
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_Quit
+*/
+TTF_Init :: () -> bool #foreign libsdl3_ttf;
+
+/**
+* Create a font from a file, using a specified point size.
+*
+* Some .fon fonts will have several sizes embedded in the file, so the point
+* size becomes the index of choosing which size. If the value is too high,
+* the last indexed size will be the default.
+*
+* When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
+*
+* \param file path to font file.
+* \param ptsize point size to use for the newly-opened font.
+* \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CloseFont
+*/
+TTF_OpenFont :: (file: *u8, ptsize: float) -> *TTF_Font #foreign libsdl3_ttf;
+
+/**
+* Create a font from an SDL_IOStream, using a specified point size.
+*
+* Some .fon fonts will have several sizes embedded in the file, so the point
+* size becomes the index of choosing which size. If the value is too high,
+* the last indexed size will be the default.
+*
+* If `closeio` is true, `src` will be automatically closed once the font is
+* closed. Otherwise you should close `src` yourself after closing the font.
+*
+* When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
+*
+* \param src an SDL_IOStream to provide a font file's data.
+* \param closeio true to close `src` when the font is closed, false to leave
+*                it open.
+* \param ptsize point size to use for the newly-opened font.
+* \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CloseFont
+*/
+TTF_OpenFontIO :: (src: *SDL_IOStream, closeio: bool, ptsize: float) -> *TTF_Font #foreign libsdl3_ttf;
+
+/**
+* Create a font with the specified properties.
+*
+* These are the supported properties:
+*
+* - `TTF_PROP_FONT_CREATE_FILENAME_STRING`: the font file to open, if an
+*   SDL_IOStream isn't being used. This is required if
+*   `TTF_PROP_FONT_CREATE_IOSTREAM_POINTER` and
+*   `TTF_PROP_FONT_CREATE_EXISTING_FONT` aren't set.
+* - `TTF_PROP_FONT_CREATE_IOSTREAM_POINTER`: an SDL_IOStream containing the
+*   font to be opened. This should not be closed until the font is closed.
+*   This is required if `TTF_PROP_FONT_CREATE_FILENAME_STRING` and
+*   `TTF_PROP_FONT_CREATE_EXISTING_FONT` aren't set.
+* - `TTF_PROP_FONT_CREATE_IOSTREAM_OFFSET_NUMBER`: the offset in the iostream
+*   for the beginning of the font, defaults to 0.
+* - `TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN`: true if closing the
+*   font should also close the associated SDL_IOStream.
+* - `TTF_PROP_FONT_CREATE_SIZE_FLOAT`: the point size of the font. Some .fon
+*   fonts will have several sizes embedded in the file, so the point size
+*   becomes the index of choosing which size. If the value is too high, the
+*   last indexed size will be the default.
+* - `TTF_PROP_FONT_CREATE_FACE_NUMBER`: the face index of the font, if the
+*   font contains multiple font faces.
+* - `TTF_PROP_FONT_CREATE_HORIZONTAL_DPI_NUMBER`: the horizontal DPI to use
+*   for font rendering, defaults to
+*   `TTF_PROP_FONT_CREATE_VERTICAL_DPI_NUMBER` if set, or 72 otherwise.
+* - `TTF_PROP_FONT_CREATE_VERTICAL_DPI_NUMBER`: the vertical DPI to use for
+*   font rendering, defaults to `TTF_PROP_FONT_CREATE_HORIZONTAL_DPI_NUMBER`
+*   if set, or 72 otherwise.
+* - `TTF_PROP_FONT_CREATE_EXISTING_FONT`: an optional TTF_Font that, if set,
+*   will be used as the font data source and the initial size and style of
+*   the new font.
+*
+* \param props the properties to use.
+* \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CloseFont
+*/
+TTF_OpenFontWithProperties :: (props: SDL_PropertiesID) -> *TTF_Font #foreign libsdl3_ttf;
+
+/**
+* Create a copy of an existing font.
+*
+* The copy will be distinct from the original, but will share the font file
+* and have the same size and style as the original.
+*
+* When done with the returned TTF_Font, use TTF_CloseFont() to dispose of it.
+*
+* \param existing_font the font to copy.
+* \returns a valid TTF_Font, or NULL on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               original font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CloseFont
+*/
+TTF_CopyFont :: (existing_font: *TTF_Font) -> *TTF_Font #foreign libsdl3_ttf;
+
+/**
+* Get the properties associated with a font.
+*
+* The following read-write properties are provided by SDL:
+*
+* - `TTF_PROP_FONT_OUTLINE_LINE_CAP_NUMBER`: The FT_Stroker_LineCap value
+*   used when setting the font outline, defaults to
+*   `FT_STROKER_LINECAP_ROUND`.
+* - `TTF_PROP_FONT_OUTLINE_LINE_JOIN_NUMBER`: The FT_Stroker_LineJoin value
+*   used when setting the font outline, defaults to
+*   `FT_STROKER_LINEJOIN_ROUND`.
+* - `TTF_PROP_FONT_OUTLINE_MITER_LIMIT_NUMBER`: The FT_Fixed miter limit used
+*   when setting the font outline, defaults to 0.
+*
+* \param font the font to query.
+* \returns a valid property ID on success or 0 on failure; call
+*          SDL_GetError() for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontProperties :: (font: *TTF_Font) -> SDL_PropertiesID #foreign libsdl3_ttf;
+
+/**
+* Get the font generation.
+*
+* The generation is incremented each time font properties change that require
+* rebuilding glyphs, such as style, size, etc.
+*
+* \param font the font to query.
+* \returns the font generation or 0 on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontGeneration :: (font: *TTF_Font) -> Uint32 #foreign libsdl3_ttf;
+
+/**
+* Add a fallback font.
+*
+* Add a font that will be used for glyphs that are not in the current font.
+* The fallback font should have the same size and style as the current font.
+*
+* If there are multiple fallback fonts, they are used in the order added.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to modify.
+* \param fallback the font to add as a fallback.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created
+*               both fonts.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_ClearFallbackFonts
+* \sa TTF_RemoveFallbackFont
+*/
+TTF_AddFallbackFont :: (font: *TTF_Font, fallback: *TTF_Font) -> bool #foreign libsdl3_ttf;
+
+/**
+* Remove a fallback font.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to modify.
+* \param fallback the font to remove as a fallback.
+*
+* \threadsafety This function should be called on the thread that created
+*               both fonts.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_AddFallbackFont
+* \sa TTF_ClearFallbackFonts
+*/
+TTF_RemoveFallbackFont :: (font: *TTF_Font, fallback: *TTF_Font) -> void #foreign libsdl3_ttf;
+
+/**
+* Remove all fallback fonts.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to modify.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_AddFallbackFont
+* \sa TTF_RemoveFallbackFont
+*/
+TTF_ClearFallbackFonts :: (font: *TTF_Font) -> void #foreign libsdl3_ttf;
+
+/**
+* Set a font's size dynamically.
+*
+* This updates any TTF_Text objects using this font, and clears
+* already-generated glyphs, if any, from the cache.
+*
+* \param font the font to resize.
+* \param ptsize the new point size.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontSize
+*/
+TTF_SetFontSize :: (font: *TTF_Font, ptsize: float) -> bool #foreign libsdl3_ttf;
+
+/**
+* Set font size dynamically with target resolutions, in dots per inch.
+*
+* This updates any TTF_Text objects using this font, and clears
+* already-generated glyphs, if any, from the cache.
+*
+* \param font the font to resize.
+* \param ptsize the new point size.
+* \param hdpi the target horizontal DPI.
+* \param vdpi the target vertical DPI.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontSize
+* \sa TTF_GetFontSizeDPI
+*/
+TTF_SetFontSizeDPI :: (font: *TTF_Font, ptsize: float, hdpi: s32, vdpi: s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the size of a font.
+*
+* \param font the font to query.
+* \returns the size of the font, or 0.0f on failure; call SDL_GetError() for
+*          more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontSize
+* \sa TTF_SetFontSizeDPI
+*/
+TTF_GetFontSize :: (font: *TTF_Font) -> float #foreign libsdl3_ttf;
+
+/**
+* Get font target resolutions, in dots per inch.
+*
+* \param font the font to query.
+* \param hdpi a pointer filled in with the target horizontal DPI.
+* \param vdpi a pointer filled in with the target vertical DPI.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontSizeDPI
+*/
+TTF_GetFontDPI :: (font: *TTF_Font, hdpi: *s32, vdpi: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Font style flags for TTF_Font
+*
+* These are the flags which can be used to set the style of a font in
+* SDL_ttf. A combination of these flags can be used with functions that set
+* or query font style, such as TTF_SetFontStyle or TTF_GetFontStyle.
+*
+* \since This datatype is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontStyle
+* \sa TTF_GetFontStyle
+*/
+TTF_FontStyleFlags :: Uint32;
+
+/**
+* Set a font's current style.
+*
+* This updates any TTF_Text objects using this font, and clears
+* already-generated glyphs, if any, from the cache.
+*
+* The font styles are a set of bit flags, OR'd together:
+*
+* - `TTF_STYLE_NORMAL` (is zero)
+* - `TTF_STYLE_BOLD`
+* - `TTF_STYLE_ITALIC`
+* - `TTF_STYLE_UNDERLINE`
+* - `TTF_STYLE_STRIKETHROUGH`
+*
+* \param font the font to set a new style on.
+* \param style the new style values to set, OR'd together.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontStyle
+*/
+TTF_SetFontStyle :: (font: *TTF_Font, style: TTF_FontStyleFlags) -> void #foreign libsdl3_ttf;
+
+/**
+* Query a font's current style.
+*
+* The font styles are a set of bit flags, OR'd together:
+*
+* - `TTF_STYLE_NORMAL` (is zero)
+* - `TTF_STYLE_BOLD`
+* - `TTF_STYLE_ITALIC`
+* - `TTF_STYLE_UNDERLINE`
+* - `TTF_STYLE_STRIKETHROUGH`
+*
+* \param font the font to query.
+* \returns the current font style, as a set of bit flags.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontStyle
+*/
+TTF_GetFontStyle :: (font: *TTF_Font) -> TTF_FontStyleFlags #foreign libsdl3_ttf;
+
+/**
+* Set a font's current outline.
+*
+* This uses the font properties `TTF_PROP_FONT_OUTLINE_LINE_CAP_NUMBER`,
+* `TTF_PROP_FONT_OUTLINE_LINE_JOIN_NUMBER`, and
+* `TTF_PROP_FONT_OUTLINE_MITER_LIMIT_NUMBER` when setting the font outline.
+*
+* This updates any TTF_Text objects using this font, and clears
+* already-generated glyphs, if any, from the cache.
+*
+* \param font the font to set a new outline on.
+* \param outline positive outline value, 0 to default.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontOutline
+*/
+TTF_SetFontOutline :: (font: *TTF_Font, outline: s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query a font's current outline.
+*
+* \param font the font to query.
+* \returns the font's current outline value.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontOutline
+*/
+TTF_GetFontOutline :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* Hinting flags for TTF (TrueType Fonts)
+*
+* This enum specifies the level of hinting to be applied to the font
+* rendering. The hinting level determines how much the font's outlines are
+* adjusted for better alignment on the pixel grid.
+*
+* \since This enum is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontHinting
+* \sa TTF_GetFontHinting
+*/
+TTF_HintingFlags :: enum s32 {
+    INVALID        :: -1;
+    NORMAL         :: 0;
+    LIGHT          :: 1;
+    MONO           :: 2;
+    NONE           :: 3;
+    LIGHT_SUBPIXEL :: 4;
+
+    TTF_HINTING_INVALID        :: INVALID;
+    TTF_HINTING_NORMAL         :: NORMAL;
+    TTF_HINTING_LIGHT          :: LIGHT;
+    TTF_HINTING_MONO           :: MONO;
+    TTF_HINTING_NONE           :: NONE;
+    TTF_HINTING_LIGHT_SUBPIXEL :: LIGHT_SUBPIXEL;
+}
+
+/**
+* Set a font's current hinter setting.
+*
+* This updates any TTF_Text objects using this font, and clears
+* already-generated glyphs, if any, from the cache.
+*
+* The hinter setting is a single value:
+*
+* - `TTF_HINTING_NORMAL`
+* - `TTF_HINTING_LIGHT`
+* - `TTF_HINTING_MONO`
+* - `TTF_HINTING_NONE`
+* - `TTF_HINTING_LIGHT_SUBPIXEL` (available in SDL_ttf 3.0.0 and later)
+*
+* \param font the font to set a new hinter setting on.
+* \param hinting the new hinter setting.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontHinting
+*/
+TTF_SetFontHinting :: (font: *TTF_Font, hinting: TTF_HintingFlags) -> void #foreign libsdl3_ttf;
+
+/**
+* Query the number of faces of a font.
+*
+* \param font the font to query.
+* \returns the number of FreeType font faces.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetNumFontFaces :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* Query a font's current FreeType hinter setting.
+*
+* The hinter setting is a single value:
+*
+* - `TTF_HINTING_NORMAL`
+* - `TTF_HINTING_LIGHT`
+* - `TTF_HINTING_MONO`
+* - `TTF_HINTING_NONE`
+* - `TTF_HINTING_LIGHT_SUBPIXEL` (available in SDL_ttf 3.0.0 and later)
+*
+* \param font the font to query.
+* \returns the font's current hinter value, or TTF_HINTING_INVALID if the
+*          font is invalid.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontHinting
+*/
+TTF_GetFontHinting :: (font: *TTF_Font) -> TTF_HintingFlags #foreign libsdl3_ttf;
+
+/**
+* Enable Signed Distance Field rendering for a font.
+*
+* SDF is a technique that helps fonts look sharp even when scaling and
+* rotating, and requires special shader support for display.
+*
+* This works with Blended APIs, and generates the raw signed distance values
+* in the alpha channel of the resulting texture.
+*
+* This updates any TTF_Text objects using this font, and clears
+* already-generated glyphs, if any, from the cache.
+*
+* \param font the font to set SDF support on.
+* \param enabled true to enable SDF, false to disable.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontSDF
+*/
+TTF_SetFontSDF :: (font: *TTF_Font, enabled: bool) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query whether Signed Distance Field rendering is enabled for a font.
+*
+* \param font the font to query.
+* \returns true if enabled, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontSDF
+*/
+TTF_GetFontSDF :: (font: *TTF_Font) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query a font's weight, in terms of the lightness/heaviness of the strokes.
+*
+* \param font the font to query.
+* \returns the font's current weight.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.4.0.
+*/
+TTF_GetFontWeight :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* The horizontal alignment used when rendering wrapped text.
+*
+* \since This enum is available since SDL_ttf 3.0.0.
+*/
+TTF_HorizontalAlignment :: enum s32 {
+    INVALID :: -1;
+    LEFT    :: 0;
+    CENTER  :: 1;
+    RIGHT   :: 2;
+
+    TTF_HORIZONTAL_ALIGN_INVALID :: INVALID;
+    TTF_HORIZONTAL_ALIGN_LEFT    :: LEFT;
+    TTF_HORIZONTAL_ALIGN_CENTER  :: CENTER;
+    TTF_HORIZONTAL_ALIGN_RIGHT   :: RIGHT;
+}
+
+/**
+* Set a font's current wrap alignment option.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to set a new wrap alignment option on.
+* \param align the new wrap alignment option.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontWrapAlignment
+*/
+TTF_SetFontWrapAlignment :: (font: *TTF_Font, align: TTF_HorizontalAlignment) -> void #foreign libsdl3_ttf;
+
+/**
+* Query a font's current wrap alignment option.
+*
+* \param font the font to query.
+* \returns the font's current wrap alignment option.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontWrapAlignment
+*/
+TTF_GetFontWrapAlignment :: (font: *TTF_Font) -> TTF_HorizontalAlignment #foreign libsdl3_ttf;
+
+/**
+* Query the total height of a font.
+*
+* This is usually equal to point size.
+*
+* \param font the font to query.
+* \returns the font's height.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontHeight :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* Query the offset from the baseline to the top of a font.
+*
+* This is a positive value, relative to the baseline.
+*
+* \param font the font to query.
+* \returns the font's ascent.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontAscent :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* Query the offset from the baseline to the bottom of a font.
+*
+* This is a negative value, relative to the baseline.
+*
+* \param font the font to query.
+* \returns the font's descent.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontDescent :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* Set the spacing between lines of text for a font.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to modify.
+* \param lineskip the new line spacing for the font.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontLineSkip
+*/
+TTF_SetFontLineSkip :: (font: *TTF_Font, lineskip: s32) -> void #foreign libsdl3_ttf;
+
+/**
+* Query the spacing between lines of text for a font.
+*
+* \param font the font to query.
+* \returns the font's recommended spacing.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontLineSkip
+*/
+TTF_GetFontLineSkip :: (font: *TTF_Font) -> s32 #foreign libsdl3_ttf;
+
+/**
+* Set if kerning is enabled for a font.
+*
+* Newly-opened fonts default to allowing kerning. This is generally a good
+* policy unless you have a strong reason to disable it, as it tends to
+* produce better rendering (with kerning disabled, some fonts might render
+* the word `kerning` as something that looks like `keming` for example).
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to set kerning on.
+* \param enabled true to enable kerning, false to disable.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetFontKerning
+*/
+TTF_SetFontKerning :: (font: *TTF_Font, enabled: bool) -> void #foreign libsdl3_ttf;
+
+/**
+* Query whether or not kerning is enabled for a font.
+*
+* \param font the font to query.
+* \returns true if kerning is enabled, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontKerning
+*/
+TTF_GetFontKerning :: (font: *TTF_Font) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query whether a font is fixed-width.
+*
+* A "fixed-width" font means all glyphs are the same width across; a
+* lowercase 'i' will be the same size across as a capital 'W', for example.
+* This is common for terminals and text editors, and other apps that treat
+* text as a grid. Most other things (WYSIWYG word processors, web pages, etc)
+* are more likely to not be fixed-width in most cases.
+*
+* \param font the font to query.
+* \returns true if the font is fixed-width, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_FontIsFixedWidth :: (font: *TTF_Font) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query whether a font is scalable or not.
+*
+* Scalability lets us distinguish between outline and bitmap fonts.
+*
+* \param font the font to query.
+* \returns true if the font is scalable, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontSDF
+*/
+TTF_FontIsScalable :: (font: *TTF_Font) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query a font's family name.
+*
+* This string is dictated by the contents of the font file.
+*
+* Note that the returned string is to internal storage, and should not be
+* modified or free'd by the caller. The string becomes invalid, with the rest
+* of the font, when `font` is handed to TTF_CloseFont().
+*
+* \param font the font to query.
+* \returns the font's family name.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontFamilyName :: (font: *TTF_Font) -> *u8 #foreign libsdl3_ttf;
+
+/**
+* Query a font's style name.
+*
+* This string is dictated by the contents of the font file.
+*
+* Note that the returned string is to internal storage, and should not be
+* modified or free'd by the caller. The string becomes invalid, with the rest
+* of the font, when `font` is handed to TTF_CloseFont().
+*
+* \param font the font to query.
+* \returns the font's style name.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontStyleName :: (font: *TTF_Font) -> *u8 #foreign libsdl3_ttf;
+
+/**
+* Direction flags
+*
+* The values here are chosen to match
+* [hb_direction_t](https://harfbuzz.github.io/harfbuzz-hb-common.html#hb-direction-t)
+* .
+*
+* \since This enum is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetFontDirection
+*/
+TTF_Direction :: enum u32 {
+    INVALID :: 0;
+    LTR     :: 4;
+    RTL     :: 5;
+    TTB     :: 6;
+    BTT     :: 7;
+
+    TTF_DIRECTION_INVALID :: INVALID;
+    TTF_DIRECTION_LTR     :: LTR;
+    TTF_DIRECTION_RTL     :: RTL;
+    TTF_DIRECTION_TTB     :: TTB;
+    TTF_DIRECTION_BTT     :: BTT;
+}
+
+/**
+* Set the direction to be used for text shaping by a font.
+*
+* This function only supports left-to-right text shaping if SDL_ttf was not
+* built with HarfBuzz support.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to modify.
+* \param direction the new direction for text to flow.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_SetFontDirection :: (font: *TTF_Font, direction: TTF_Direction) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the direction to be used for text shaping by a font.
+*
+* This defaults to TTF_DIRECTION_INVALID if it hasn't been set.
+*
+* \param font the font to query.
+* \returns the direction to be used for text shaping.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetFontDirection :: (font: *TTF_Font) -> TTF_Direction #foreign libsdl3_ttf;
+
+/**
+* Convert from a 4 character string to a 32-bit tag.
+*
+* \param string the 4 character string to convert.
+* \returns the 32-bit representation of the string.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_TagToString
+*/
+TTF_StringToTag :: (_string: *u8) -> Uint32 #foreign libsdl3_ttf;
+
+/**
+* Convert from a 32-bit tag to a 4 character string.
+*
+* \param tag the 32-bit tag to convert.
+* \param string a pointer filled in with the 4 character representation of
+*               the tag.
+* \param size the size of the buffer pointed at by string, should be at least
+*             4.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_TagToString
+*/
+TTF_TagToString :: (tag: Uint32, _string: *u8, size: u64) -> void #foreign libsdl3_ttf;
+
+/**
+* Set the script to be used for text shaping by a font.
+*
+* This returns false if SDL_ttf isn't built with HarfBuzz support.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to modify.
+* \param script an
+*               [ISO 15924 code](https://unicode.org/iso15924/iso15924-codes.html)
+*               .
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_StringToTag
+*/
+TTF_SetFontScript :: (font: *TTF_Font, script: Uint32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the script used for text shaping a font.
+*
+* \param font the font to query.
+* \returns an
+*          [ISO 15924 code](https://unicode.org/iso15924/iso15924-codes.html)
+*          or 0 if a script hasn't been set.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_TagToString
+*/
+TTF_GetFontScript :: (font: *TTF_Font) -> Uint32 #foreign libsdl3_ttf;
+
+/**
+* Get the script used by a 32-bit codepoint.
+*
+* \param ch the character code to check.
+* \returns an
+*          [ISO 15924 code](https://unicode.org/iso15924/iso15924-codes.html)
+*          on success, or 0 on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function is thread-safe.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_TagToString
+*/
+TTF_GetGlyphScript :: (ch: Uint32) -> Uint32 #foreign libsdl3_ttf;
+
+/**
+* Set language to be used for text shaping by a font.
+*
+* If SDL_ttf was not built with HarfBuzz support, this function returns
+* false.
+*
+* This updates any TTF_Text objects using this font.
+*
+* \param font the font to specify a language for.
+* \param language_bcp47 a null-terminated string containing the desired
+*                       language's BCP47 code. Or null to reset the value.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_SetFontLanguage :: (font: *TTF_Font, language_bcp47: *u8) -> bool #foreign libsdl3_ttf;
+
+/**
+* Check whether a glyph is provided by the font for a UNICODE codepoint.
+*
+* \param font the font to query.
+* \param ch the codepoint to check.
+* \returns true if font provides a glyph for this character, false if not.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_FontHasGlyph :: (font: *TTF_Font, ch: Uint32) -> bool #foreign libsdl3_ttf;
+
+/**
+* The type of data in a glyph image
+*
+* \since This enum is available since SDL_ttf 3.0.0.
+*/
+TTF_ImageType :: enum u32 {
+    INVALID :: 0;
+    ALPHA   :: 1;
+    COLOR   :: 2;
+    SDF     :: 3;
+
+    TTF_IMAGE_INVALID :: INVALID;
+    TTF_IMAGE_ALPHA   :: ALPHA;
+    TTF_IMAGE_COLOR   :: COLOR;
+    TTF_IMAGE_SDF     :: SDF;
+}
+
+/**
+* Get the pixel image for a UNICODE codepoint.
+*
+* \param font the font to query.
+* \param ch the codepoint to check.
+* \param image_type a pointer filled in with the glyph image type, may be
+*                   NULL.
+* \returns an SDL_Surface containing the glyph, or NULL on failure; call
+*          SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetGlyphImage :: (font: *TTF_Font, ch: Uint32, image_type: *TTF_ImageType) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Get the pixel image for a character index.
+*
+* This is useful for text engine implementations, which can call this with
+* the `glyph_index` in a TTF_CopyOperation
+*
+* \param font the font to query.
+* \param glyph_index the index of the glyph to return.
+* \param image_type a pointer filled in with the glyph image type, may be
+*                   NULL.
+* \returns an SDL_Surface containing the glyph, or NULL on failure; call
+*          SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetGlyphImageForIndex :: (font: *TTF_Font, glyph_index: Uint32, image_type: *TTF_ImageType) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Query the metrics (dimensions) of a font's glyph for a UNICODE codepoint.
+*
+* To understand what these metrics mean, here is a useful link:
+*
+* https://freetype.sourceforge.net/freetype2/docs/tutorial/step2.html
+*
+* \param font the font to query.
+* \param ch the codepoint to check.
+* \param minx a pointer filled in with the minimum x coordinate of the glyph
+*             from the left edge of its bounding box. This value may be
+*             negative.
+* \param maxx a pointer filled in with the maximum x coordinate of the glyph
+*             from the left edge of its bounding box.
+* \param miny a pointer filled in with the minimum y coordinate of the glyph
+*             from the bottom edge of its bounding box. This value may be
+*             negative.
+* \param maxy a pointer filled in with the maximum y coordinate of the glyph
+*             from the bottom edge of its bounding box.
+* \param advance a pointer filled in with the distance to the next glyph from
+*                the left edge of this glyph's bounding box.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetGlyphMetrics :: (font: *TTF_Font, ch: Uint32, minx: *s32, maxx: *s32, miny: *s32, maxy: *s32, advance: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Query the kerning size between the glyphs of two UNICODE codepoints.
+*
+* \param font the font to query.
+* \param previous_ch the previous codepoint.
+* \param ch the current codepoint.
+* \param kerning a pointer filled in with the kerning size between the two
+*                glyphs, in pixels, may be NULL.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetGlyphKerning :: (font: *TTF_Font, previous_ch: Uint32, ch: Uint32, kerning: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Calculate the dimensions of a rendered string of UTF-8 text.
+*
+* This will report the width and height, in pixels, of the space that the
+* specified string will take to fully render.
+*
+* \param font the font to query.
+* \param text text to calculate, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param w will be filled with width, in pixels, on return.
+* \param h will be filled with height, in pixels, on return.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetStringSize :: (font: *TTF_Font, text: *u8, length: u64, w: *s32, h: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Calculate the dimensions of a rendered string of UTF-8 text.
+*
+* This will report the width and height, in pixels, of the space that the
+* specified string will take to fully render.
+*
+* Text is wrapped to multiple lines on line endings and on word boundaries if
+* it extends beyond `wrap_width` in pixels.
+*
+* If wrap_width is 0, this function will only wrap on newline characters.
+*
+* \param font the font to query.
+* \param text text to calculate, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param wrap_width the maximum width or 0 to wrap on newline characters.
+* \param w will be filled with width, in pixels, on return.
+* \param h will be filled with height, in pixels, on return.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetStringSizeWrapped :: (font: *TTF_Font, text: *u8, length: u64, wrap_width: s32, w: *s32, h: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Calculate how much of a UTF-8 string will fit in a given width.
+*
+* This reports the number of characters that can be rendered before reaching
+* `max_width`.
+*
+* This does not need to render the string to do this calculation.
+*
+* \param font the font to query.
+* \param text text to calculate, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param max_width maximum width, in pixels, available for the string, or 0
+*                  for unbounded width.
+* \param measured_width a pointer filled in with the width, in pixels, of the
+*                       string that will fit, may be NULL.
+* \param measured_length a pointer filled in with the length, in bytes, of
+*                        the string that will fit, may be NULL.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_MeasureString :: (font: *TTF_Font, text: *u8, length: u64, max_width: s32, measured_width: *s32, measured_length: *u64) -> bool #foreign libsdl3_ttf;
+
+/**
+* Render UTF-8 text at fast quality to a new 8-bit surface.
+*
+* This function will allocate a new 8-bit, palettized surface. The surface's
+* 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
+* will be set to the text color.
+*
+* This will not word-wrap the string; you'll get a surface with a single line
+* of text, as long as the string requires. You can use
+* TTF_RenderText_Solid_Wrapped() instead if you need to wrap the output to
+* multiple lines.
+*
+* This will not wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Shaded,
+* TTF_RenderText_Blended, and TTF_RenderText_LCD.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \returns a new 8-bit, palettized surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended
+* \sa TTF_RenderText_LCD
+* \sa TTF_RenderText_Shaded
+* \sa TTF_RenderText_Solid
+* \sa TTF_RenderText_Solid_Wrapped
+*/
+TTF_RenderText_Solid :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render word-wrapped UTF-8 text at fast quality to a new 8-bit surface.
+*
+* This function will allocate a new 8-bit, palettized surface. The surface's
+* 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
+* will be set to the text color.
+*
+* Text is wrapped to multiple lines on line endings and on word boundaries if
+* it extends beyond `wrapLength` in pixels.
+*
+* If wrapLength is 0, this function will only wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Shaded_Wrapped,
+* TTF_RenderText_Blended_Wrapped, and TTF_RenderText_LCD_Wrapped.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \param wrapLength the maximum width of the text surface or 0 to wrap on
+*                   newline characters.
+* \returns a new 8-bit, palettized surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended_Wrapped
+* \sa TTF_RenderText_LCD_Wrapped
+* \sa TTF_RenderText_Shaded_Wrapped
+* \sa TTF_RenderText_Solid
+*/
+TTF_RenderText_Solid_Wrapped :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color, wrapLength: s32) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render a single 32-bit glyph at fast quality to a new 8-bit surface.
+*
+* This function will allocate a new 8-bit, palettized surface. The surface's
+* 0 pixel will be the colorkey, giving a transparent background. The 1 pixel
+* will be set to the text color.
+*
+* The glyph is rendered without any padding or centering in the X direction,
+* and aligned normally in the Y direction.
+*
+* You can render at other quality levels with TTF_RenderGlyph_Shaded,
+* TTF_RenderGlyph_Blended, and TTF_RenderGlyph_LCD.
+*
+* \param font the font to render with.
+* \param ch the character to render.
+* \param fg the foreground color for the text.
+* \returns a new 8-bit, palettized surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderGlyph_Blended
+* \sa TTF_RenderGlyph_LCD
+* \sa TTF_RenderGlyph_Shaded
+*/
+TTF_RenderGlyph_Solid :: (font: *TTF_Font, ch: Uint32, fg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render UTF-8 text at high quality to a new 8-bit surface.
+*
+* This function will allocate a new 8-bit, palettized surface. The surface's
+* 0 pixel will be the specified background color, while other pixels have
+* varying degrees of the foreground color. This function returns the new
+* surface, or NULL if there was an error.
+*
+* This will not word-wrap the string; you'll get a surface with a single line
+* of text, as long as the string requires. You can use
+* TTF_RenderText_Shaded_Wrapped() instead if you need to wrap the output to
+* multiple lines.
+*
+* This will not wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Solid,
+* TTF_RenderText_Blended, and TTF_RenderText_LCD.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \param bg the background color for the text.
+* \returns a new 8-bit, palettized surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended
+* \sa TTF_RenderText_LCD
+* \sa TTF_RenderText_Shaded_Wrapped
+* \sa TTF_RenderText_Solid
+*/
+TTF_RenderText_Shaded :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color, bg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render word-wrapped UTF-8 text at high quality to a new 8-bit surface.
+*
+* This function will allocate a new 8-bit, palettized surface. The surface's
+* 0 pixel will be the specified background color, while other pixels have
+* varying degrees of the foreground color. This function returns the new
+* surface, or NULL if there was an error.
+*
+* Text is wrapped to multiple lines on line endings and on word boundaries if
+* it extends beyond `wrap_width` in pixels.
+*
+* If wrap_width is 0, this function will only wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Solid_Wrapped,
+* TTF_RenderText_Blended_Wrapped, and TTF_RenderText_LCD_Wrapped.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \param bg the background color for the text.
+* \param wrap_width the maximum width of the text surface or 0 to wrap on
+*                   newline characters.
+* \returns a new 8-bit, palettized surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended_Wrapped
+* \sa TTF_RenderText_LCD_Wrapped
+* \sa TTF_RenderText_Shaded
+* \sa TTF_RenderText_Solid_Wrapped
+*/
+TTF_RenderText_Shaded_Wrapped :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color, bg: SDL_Color, wrap_width: s32) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render a single UNICODE codepoint at high quality to a new 8-bit surface.
+*
+* This function will allocate a new 8-bit, palettized surface. The surface's
+* 0 pixel will be the specified background color, while other pixels have
+* varying degrees of the foreground color. This function returns the new
+* surface, or NULL if there was an error.
+*
+* The glyph is rendered without any padding or centering in the X direction,
+* and aligned normally in the Y direction.
+*
+* You can render at other quality levels with TTF_RenderGlyph_Solid,
+* TTF_RenderGlyph_Blended, and TTF_RenderGlyph_LCD.
+*
+* \param font the font to render with.
+* \param ch the codepoint to render.
+* \param fg the foreground color for the text.
+* \param bg the background color for the text.
+* \returns a new 8-bit, palettized surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderGlyph_Blended
+* \sa TTF_RenderGlyph_LCD
+* \sa TTF_RenderGlyph_Solid
+*/
+TTF_RenderGlyph_Shaded :: (font: *TTF_Font, ch: Uint32, fg: SDL_Color, bg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render UTF-8 text at high quality to a new ARGB surface.
+*
+* This function will allocate a new 32-bit, ARGB surface, using alpha
+* blending to dither the font with the given color. This function returns the
+* new surface, or NULL if there was an error.
+*
+* This will not word-wrap the string; you'll get a surface with a single line
+* of text, as long as the string requires. You can use
+* TTF_RenderText_Blended_Wrapped() instead if you need to wrap the output to
+* multiple lines.
+*
+* This will not wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Solid,
+* TTF_RenderText_Shaded, and TTF_RenderText_LCD.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended_Wrapped
+* \sa TTF_RenderText_LCD
+* \sa TTF_RenderText_Shaded
+* \sa TTF_RenderText_Solid
+*/
+TTF_RenderText_Blended :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render word-wrapped UTF-8 text at high quality to a new ARGB surface.
+*
+* This function will allocate a new 32-bit, ARGB surface, using alpha
+* blending to dither the font with the given color. This function returns the
+* new surface, or NULL if there was an error.
+*
+* Text is wrapped to multiple lines on line endings and on word boundaries if
+* it extends beyond `wrap_width` in pixels.
+*
+* If wrap_width is 0, this function will only wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Solid_Wrapped,
+* TTF_RenderText_Shaded_Wrapped, and TTF_RenderText_LCD_Wrapped.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \param wrap_width the maximum width of the text surface or 0 to wrap on
+*                   newline characters.
+* \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended
+* \sa TTF_RenderText_LCD_Wrapped
+* \sa TTF_RenderText_Shaded_Wrapped
+* \sa TTF_RenderText_Solid_Wrapped
+*/
+TTF_RenderText_Blended_Wrapped :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color, wrap_width: s32) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render a single UNICODE codepoint at high quality to a new ARGB surface.
+*
+* This function will allocate a new 32-bit, ARGB surface, using alpha
+* blending to dither the font with the given color. This function returns the
+* new surface, or NULL if there was an error.
+*
+* The glyph is rendered without any padding or centering in the X direction,
+* and aligned normally in the Y direction.
+*
+* You can render at other quality levels with TTF_RenderGlyph_Solid,
+* TTF_RenderGlyph_Shaded, and TTF_RenderGlyph_LCD.
+*
+* \param font the font to render with.
+* \param ch the codepoint to render.
+* \param fg the foreground color for the text.
+* \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderGlyph_LCD
+* \sa TTF_RenderGlyph_Shaded
+* \sa TTF_RenderGlyph_Solid
+*/
+TTF_RenderGlyph_Blended :: (font: *TTF_Font, ch: Uint32, fg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render UTF-8 text at LCD subpixel quality to a new ARGB surface.
+*
+* This function will allocate a new 32-bit, ARGB surface, and render
+* alpha-blended text using FreeType's LCD subpixel rendering. This function
+* returns the new surface, or NULL if there was an error.
+*
+* This will not word-wrap the string; you'll get a surface with a single line
+* of text, as long as the string requires. You can use
+* TTF_RenderText_LCD_Wrapped() instead if you need to wrap the output to
+* multiple lines.
+*
+* This will not wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Solid,
+* TTF_RenderText_Shaded, and TTF_RenderText_Blended.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \param bg the background color for the text.
+* \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended
+* \sa TTF_RenderText_LCD_Wrapped
+* \sa TTF_RenderText_Shaded
+* \sa TTF_RenderText_Solid
+*/
+TTF_RenderText_LCD :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color, bg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render word-wrapped UTF-8 text at LCD subpixel quality to a new ARGB
+* surface.
+*
+* This function will allocate a new 32-bit, ARGB surface, and render
+* alpha-blended text using FreeType's LCD subpixel rendering. This function
+* returns the new surface, or NULL if there was an error.
+*
+* Text is wrapped to multiple lines on line endings and on word boundaries if
+* it extends beyond `wrap_width` in pixels.
+*
+* If wrap_width is 0, this function will only wrap on newline characters.
+*
+* You can render at other quality levels with TTF_RenderText_Solid_Wrapped,
+* TTF_RenderText_Shaded_Wrapped, and TTF_RenderText_Blended_Wrapped.
+*
+* \param font the font to render with.
+* \param text text to render, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \param fg the foreground color for the text.
+* \param bg the background color for the text.
+* \param wrap_width the maximum width of the text surface or 0 to wrap on
+*                   newline characters.
+* \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderText_Blended_Wrapped
+* \sa TTF_RenderText_LCD
+* \sa TTF_RenderText_Shaded_Wrapped
+* \sa TTF_RenderText_Solid_Wrapped
+*/
+TTF_RenderText_LCD_Wrapped :: (font: *TTF_Font, text: *u8, length: u64, fg: SDL_Color, bg: SDL_Color, wrap_width: s32) -> *SDL_Surface #foreign libsdl3_ttf;
+
+/**
+* Render a single UNICODE codepoint at LCD subpixel quality to a new ARGB
+* surface.
+*
+* This function will allocate a new 32-bit, ARGB surface, and render
+* alpha-blended text using FreeType's LCD subpixel rendering. This function
+* returns the new surface, or NULL if there was an error.
+*
+* The glyph is rendered without any padding or centering in the X direction,
+* and aligned normally in the Y direction.
+*
+* You can render at other quality levels with TTF_RenderGlyph_Solid,
+* TTF_RenderGlyph_Shaded, and TTF_RenderGlyph_Blended.
+*
+* \param font the font to render with.
+* \param ch the codepoint to render.
+* \param fg the foreground color for the text.
+* \param bg the background color for the text.
+* \returns a new 32-bit, ARGB surface, or NULL if there was an error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_RenderGlyph_Blended
+* \sa TTF_RenderGlyph_Shaded
+* \sa TTF_RenderGlyph_Solid
+*/
+TTF_RenderGlyph_LCD :: (font: *TTF_Font, ch: Uint32, fg: SDL_Color, bg: SDL_Color) -> *SDL_Surface #foreign libsdl3_ttf;
+
+TTF_TextEngine :: struct {}
+
+TTF_TextData :: struct {}
+
+/**
+* Text created with TTF_CreateText()
+*
+* \since This struct is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateText
+* \sa TTF_GetTextProperties
+* \sa TTF_DestroyText
+*/
+TTF_Text :: struct {
+    text:      *u8; /**< A copy of the UTF-8 string that this text object represents, useful for layout, debugging and retrieving substring text. This is updated when the text object is modified and will be freed automatically when the object is destroyed. */
+    num_lines: s32; /**< The number of lines in the text, 0 if it's empty */
+
+    refcount:  s32; /**< Application reference count, used when freeing surface */
+
+    internal:  *TTF_TextData; /**< Private */
+}
+
+/**
+* Create a text engine for drawing text on SDL surfaces.
+*
+* \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+*          for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_DestroySurfaceTextEngine
+* \sa TTF_DrawSurfaceText
+*/
+TTF_CreateSurfaceTextEngine :: () -> *TTF_TextEngine #foreign libsdl3_ttf;
+
+/**
+* Draw text to an SDL surface.
+*
+* `text` must have been created using a TTF_TextEngine from
+* TTF_CreateSurfaceTextEngine().
+*
+* \param text the text to draw.
+* \param x the x coordinate in pixels, positive from the left edge towards
+*          the right.
+* \param y the y coordinate in pixels, positive from the top edge towards the
+*          bottom.
+* \param surface the surface to draw on.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateSurfaceTextEngine
+* \sa TTF_CreateText
+*/
+TTF_DrawSurfaceText :: (text: *TTF_Text, x: s32, y: s32, surface: *SDL_Surface) -> bool #foreign libsdl3_ttf;
+
+/**
+* Destroy a text engine created for drawing text on SDL surfaces.
+*
+* All text created by this engine should be destroyed before calling this
+* function.
+*
+* \param engine a TTF_TextEngine object created with
+*               TTF_CreateSurfaceTextEngine().
+*
+* \threadsafety This function should be called on the thread that created the
+*               engine.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateSurfaceTextEngine
+*/
+TTF_DestroySurfaceTextEngine :: (engine: *TTF_TextEngine) -> void #foreign libsdl3_ttf;
+
+/**
+* Create a text engine for drawing text on an SDL renderer.
+*
+* \param renderer the renderer to use for creating textures and drawing text.
+* \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+*          for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               renderer.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_DestroyRendererTextEngine
+* \sa TTF_DrawRendererText
+* \sa TTF_CreateRendererTextEngineWithProperties
+*/
+TTF_CreateRendererTextEngine :: (renderer: *SDL_Renderer) -> *TTF_TextEngine #foreign libsdl3_ttf;
+
+/**
+* Create a text engine for drawing text on an SDL renderer, with the
+* specified properties.
+*
+* These are the supported properties:
+*
+* - `TTF_PROP_RENDERER_TEXT_ENGINE_RENDERER`: the renderer to use for
+*   creating textures and drawing text
+* - `TTF_PROP_RENDERER_TEXT_ENGINE_ATLAS_TEXTURE_SIZE`: the size of the
+*   texture atlas
+*
+* \param props the properties to use.
+* \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+*          for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               renderer.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateRendererTextEngine
+* \sa TTF_DestroyRendererTextEngine
+* \sa TTF_DrawRendererText
+*/
+TTF_CreateRendererTextEngineWithProperties :: (props: SDL_PropertiesID) -> *TTF_TextEngine #foreign libsdl3_ttf;
+
+/**
+* Draw text to an SDL renderer.
+*
+* `text` must have been created using a TTF_TextEngine from
+* TTF_CreateRendererTextEngine(), and will draw using the renderer passed to
+* that function.
+*
+* \param text the text to draw.
+* \param x the x coordinate in pixels, positive from the left edge towards
+*          the right.
+* \param y the y coordinate in pixels, positive from the top edge towards the
+*          bottom.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateRendererTextEngine
+* \sa TTF_CreateText
+*/
+TTF_DrawRendererText :: (text: *TTF_Text, x: float, y: float) -> bool #foreign libsdl3_ttf;
+
+/**
+* Destroy a text engine created for drawing text on an SDL renderer.
+*
+* All text created by this engine should be destroyed before calling this
+* function.
+*
+* \param engine a TTF_TextEngine object created with
+*               TTF_CreateRendererTextEngine().
+*
+* \threadsafety This function should be called on the thread that created the
+*               engine.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateRendererTextEngine
+*/
+TTF_DestroyRendererTextEngine :: (engine: *TTF_TextEngine) -> void #foreign libsdl3_ttf;
+
+/**
+* Create a text engine for drawing text with the SDL GPU API.
+*
+* \param device the SDL_GPUDevice to use for creating textures and drawing
+*               text.
+* \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+*          for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               device.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateGPUTextEngineWithProperties
+* \sa TTF_DestroyGPUTextEngine
+* \sa TTF_GetGPUTextDrawData
+*/
+TTF_CreateGPUTextEngine :: (device: *SDL_GPUDevice) -> *TTF_TextEngine #foreign libsdl3_ttf;
+
+/**
+* Create a text engine for drawing text with the SDL GPU API, with the
+* specified properties.
+*
+* These are the supported properties:
+*
+* - `TTF_PROP_GPU_TEXT_ENGINE_DEVICE`: the SDL_GPUDevice to use for creating
+*   textures and drawing text.
+* - `TTF_PROP_GPU_TEXT_ENGINE_ATLAS_TEXTURE_SIZE`: the size of the texture
+*   atlas
+*
+* \param props the properties to use.
+* \returns a TTF_TextEngine object or NULL on failure; call SDL_GetError()
+*          for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               device.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateGPUTextEngine
+* \sa TTF_DestroyGPUTextEngine
+* \sa TTF_GetGPUTextDrawData
+*/
+TTF_CreateGPUTextEngineWithProperties :: (props: SDL_PropertiesID) -> *TTF_TextEngine #foreign libsdl3_ttf;
+
+/**
+* Draw sequence returned by TTF_GetGPUTextDrawData
+*
+* \since This struct is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetGPUTextDrawData
+*/
+TTF_GPUAtlasDrawSequence :: struct {
+    atlas_texture: *SDL_GPUTexture; /**< Texture atlas that stores the glyphs */
+    xy:            *SDL_FPoint; /**< An array of vertex positions */
+    uv:            *SDL_FPoint; /**< An array of normalized texture coordinates for each vertex */
+    num_vertices:  s32; /**< Number of vertices */
+    indices:       *s32; /**< An array of indices into the 'vertices' arrays */
+    num_indices:   s32; /**< Number of indices */
+    image_type:    TTF_ImageType; /**< The image type of this draw sequence */
+
+    next:          *TTF_GPUAtlasDrawSequence; /**< The next sequence (will be NULL in case of the last sequence) */
+}
+
+/**
+* Get the geometry data needed for drawing the text.
+*
+* `text` must have been created using a TTF_TextEngine from
+* TTF_CreateGPUTextEngine().
+*
+* The positive X-axis is taken towards the right and the positive Y-axis is
+* taken upwards for both the vertex and the texture coordinates, i.e, it
+* follows the same convention used by the SDL_GPU API. If you want to use a
+* different coordinate system you will need to transform the vertices
+* yourself.
+*
+* If the text looks blocky use linear filtering.
+*
+* \param text the text to draw.
+* \returns a NULL terminated linked list of TTF_GPUAtlasDrawSequence objects
+*          or NULL if the passed text is empty or in case of failure; call
+*          SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateGPUTextEngine
+* \sa TTF_CreateText
+*/
+TTF_GetGPUTextDrawData :: (text: *TTF_Text) -> *TTF_GPUAtlasDrawSequence #foreign libsdl3_ttf;
+
+/**
+* Destroy a text engine created for drawing text with the SDL GPU API.
+*
+* All text created by this engine should be destroyed before calling this
+* function.
+*
+* \param engine a TTF_TextEngine object created with
+*               TTF_CreateGPUTextEngine().
+*
+* \threadsafety This function should be called on the thread that created the
+*               engine.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateGPUTextEngine
+*/
+TTF_DestroyGPUTextEngine :: (engine: *TTF_TextEngine) -> void #foreign libsdl3_ttf;
+
+/**
+* The winding order of the vertices returned by TTF_GetGPUTextDrawData
+*
+* \since This enum is available since SDL_ttf 3.0.0.
+*/
+TTF_GPUTextEngineWinding :: enum s32 {
+    INVALID           :: -1;
+    CLOCKWISE         :: 0;
+    COUNTER_CLOCKWISE :: 1;
+
+    TTF_GPU_TEXTENGINE_WINDING_INVALID           :: INVALID;
+    TTF_GPU_TEXTENGINE_WINDING_CLOCKWISE         :: CLOCKWISE;
+    TTF_GPU_TEXTENGINE_WINDING_COUNTER_CLOCKWISE :: COUNTER_CLOCKWISE;
+}
+
+/**
+* Sets the winding order of the vertices returned by TTF_GetGPUTextDrawData
+* for a particular GPU text engine.
+*
+* \param engine a TTF_TextEngine object created with
+*               TTF_CreateGPUTextEngine().
+* \param winding the new winding order option.
+*
+* \threadsafety This function should be called on the thread that created the
+*               engine.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetGPUTextEngineWinding
+*/
+TTF_SetGPUTextEngineWinding :: (engine: *TTF_TextEngine, winding: TTF_GPUTextEngineWinding) -> void #foreign libsdl3_ttf;
+
+/**
+* Get the winding order of the vertices returned by TTF_GetGPUTextDrawData
+* for a particular GPU text engine
+*
+* \param engine a TTF_TextEngine object created with
+*               TTF_CreateGPUTextEngine().
+* \returns the winding order used by the GPU text engine or
+*          TTF_GPU_TEXTENGINE_WINDING_INVALID in case of error.
+*
+* \threadsafety This function should be called on the thread that created the
+*               engine.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetGPUTextEngineWinding
+*/
+TTF_GetGPUTextEngineWinding :: (engine: *TTF_TextEngine) -> TTF_GPUTextEngineWinding #foreign libsdl3_ttf;
+
+/**
+* Create a text object from UTF-8 text and a text engine.
+*
+* \param engine the text engine to use when creating the text object, may be
+*               NULL.
+* \param font the font to render with.
+* \param text the text to use, in UTF-8 encoding.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \returns a TTF_Text object or NULL on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               font and text engine.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_DestroyText
+*/
+TTF_CreateText :: (engine: *TTF_TextEngine, font: *TTF_Font, text: *u8, length: u64) -> *TTF_Text #foreign libsdl3_ttf;
+
+/**
+* Get the properties associated with a text object.
+*
+* \param text the TTF_Text to query.
+* \returns a valid property ID on success or 0 on failure; call
+*          SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextProperties :: (text: *TTF_Text) -> SDL_PropertiesID #foreign libsdl3_ttf;
+
+/**
+* Set the text engine used by a text object.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param engine the text engine to use for drawing.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextEngine
+*/
+TTF_SetTextEngine :: (text: *TTF_Text, engine: *TTF_TextEngine) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the text engine used by a text object.
+*
+* \param text the TTF_Text to query.
+* \returns the TTF_TextEngine used by the text on success or NULL on failure;
+*          call SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetTextEngine
+*/
+TTF_GetTextEngine :: (text: *TTF_Text) -> *TTF_TextEngine #foreign libsdl3_ttf;
+
+/**
+* Set the font used by a text object.
+*
+* When a text object has a font, any changes to the font will automatically
+* regenerate the text. If you set the font to NULL, the text will continue to
+* render but changes to the font will no longer affect the text.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param font the font to use, may be NULL.
+* \returns false if the text pointer is null; otherwise, true. call
+*          SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextFont
+*/
+TTF_SetTextFont :: (text: *TTF_Text, font: *TTF_Font) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the font used by a text object.
+*
+* \param text the TTF_Text to query.
+* \returns the TTF_Font used by the text on success or NULL on failure; call
+*          SDL_GetError() for more information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetTextFont
+*/
+TTF_GetTextFont :: (text: *TTF_Text) -> *TTF_Font #foreign libsdl3_ttf;
+
+/**
+* Set the direction to be used for text shaping a text object.
+*
+* This function only supports left-to-right text shaping if SDL_ttf was not
+* built with HarfBuzz support.
+*
+* \param text the text to modify.
+* \param direction the new direction for text to flow.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_SetTextDirection :: (text: *TTF_Text, direction: TTF_Direction) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the direction to be used for text shaping a text object.
+*
+* This defaults to the direction of the font used by the text object.
+*
+* \param text the text to query.
+* \returns the direction to be used for text shaping.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextDirection :: (text: *TTF_Text) -> TTF_Direction #foreign libsdl3_ttf;
+
+/**
+* Set the script to be used for text shaping a text object.
+*
+* This returns false if SDL_ttf isn't built with HarfBuzz support.
+*
+* \param text the text to modify.
+* \param script an
+*               [ISO 15924 code](https://unicode.org/iso15924/iso15924-codes.html)
+*               .
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_StringToTag
+*/
+TTF_SetTextScript :: (text: *TTF_Text, script: Uint32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the script used for text shaping a text object.
+*
+* This defaults to the script of the font used by the text object.
+*
+* \param text the text to query.
+* \returns an
+*          [ISO 15924 code](https://unicode.org/iso15924/iso15924-codes.html)
+*          or 0 if a script hasn't been set on either the text object or the
+*          font.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_TagToString
+*/
+TTF_GetTextScript :: (text: *TTF_Text) -> Uint32 #foreign libsdl3_ttf;
+
+/**
+* Set the color of a text object.
+*
+* The default text color is white (255, 255, 255, 255).
+*
+* \param text the TTF_Text to modify.
+* \param r the red color value in the range of 0-255.
+* \param g the green color value in the range of 0-255.
+* \param b the blue color value in the range of 0-255.
+* \param a the alpha value in the range of 0-255.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextColor
+* \sa TTF_SetTextColorFloat
+*/
+TTF_SetTextColor :: (text: *TTF_Text, r: Uint8, g: Uint8, b: Uint8, a: Uint8) -> bool #foreign libsdl3_ttf;
+
+/**
+* Set the color of a text object.
+*
+* The default text color is white (1.0f, 1.0f, 1.0f, 1.0f).
+*
+* \param text the TTF_Text to modify.
+* \param r the red color value, normally in the range of 0-1.
+* \param g the green color value, normally in the range of 0-1.
+* \param b the blue color value, normally in the range of 0-1.
+* \param a the alpha value in the range of 0-1.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextColorFloat
+* \sa TTF_SetTextColor
+*/
+TTF_SetTextColorFloat :: (text: *TTF_Text, r: float, g: float, b: float, a: float) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the color of a text object.
+*
+* \param text the TTF_Text to query.
+* \param r a pointer filled in with the red color value in the range of
+*          0-255, may be NULL.
+* \param g a pointer filled in with the green color value in the range of
+*          0-255, may be NULL.
+* \param b a pointer filled in with the blue color value in the range of
+*          0-255, may be NULL.
+* \param a a pointer filled in with the alpha value in the range of 0-255,
+*          may be NULL.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextColorFloat
+* \sa TTF_SetTextColor
+*/
+TTF_GetTextColor :: (text: *TTF_Text, r: *Uint8, g: *Uint8, b: *Uint8, a: *Uint8) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the color of a text object.
+*
+* \param text the TTF_Text to query.
+* \param r a pointer filled in with the red color value, normally in the
+*          range of 0-1, may be NULL.
+* \param g a pointer filled in with the green color value, normally in the
+*          range of 0-1, may be NULL.
+* \param b a pointer filled in with the blue color value, normally in the
+*          range of 0-1, may be NULL.
+* \param a a pointer filled in with the alpha value in the range of 0-1, may
+*          be NULL.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextColor
+* \sa TTF_SetTextColorFloat
+*/
+TTF_GetTextColorFloat :: (text: *TTF_Text, r: *float, g: *float, b: *float, a: *float) -> bool #foreign libsdl3_ttf;
+
+/**
+* Set the position of a text object.
+*
+* This can be used to position multiple text objects within a single wrapping
+* text area.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param x the x offset of the upper left corner of this text in pixels.
+* \param y the y offset of the upper left corner of this text in pixels.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextPosition
+*/
+TTF_SetTextPosition :: (text: *TTF_Text, x: s32, y: s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the position of a text object.
+*
+* \param text the TTF_Text to query.
+* \param x a pointer filled in with the x offset of the upper left corner of
+*          this text in pixels, may be NULL.
+* \param y a pointer filled in with the y offset of the upper left corner of
+*          this text in pixels, may be NULL.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetTextPosition
+*/
+TTF_GetTextPosition :: (text: *TTF_Text, x: *s32, y: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Set whether wrapping is enabled on a text object.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param wrap_width the maximum width in pixels, 0 to wrap on newline
+*                   characters.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetTextWrapWidth
+*/
+TTF_SetTextWrapWidth :: (text: *TTF_Text, wrap_width: s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get whether wrapping is enabled on a text object.
+*
+* \param text the TTF_Text to query.
+* \param wrap_width a pointer filled in with the maximum width in pixels or 0
+*                   if the text is being wrapped on newline characters.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetTextWrapWidth
+*/
+TTF_GetTextWrapWidth :: (text: *TTF_Text, wrap_width: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Set whether whitespace should be visible when wrapping a text object.
+*
+* If the whitespace is visible, it will take up space for purposes of
+* alignment and wrapping. This is good for editing, but looks better when
+* centered or aligned if whitespace around line wrapping is hidden. This
+* defaults false.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param visible true to show whitespace when wrapping text, false to hide
+*                it.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_TextWrapWhitespaceVisible
+*/
+TTF_SetTextWrapWhitespaceVisible :: (text: *TTF_Text, visible: bool) -> bool #foreign libsdl3_ttf;
+
+/**
+* Return whether whitespace is shown when wrapping a text object.
+*
+* \param text the TTF_Text to query.
+* \returns true if whitespace is shown when wrapping text, or false
+*          otherwise.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SetTextWrapWhitespaceVisible
+*/
+TTF_TextWrapWhitespaceVisible :: (text: *TTF_Text) -> bool #foreign libsdl3_ttf;
+
+/**
+* Set the UTF-8 text used by a text object.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param string the UTF-8 text to use, may be NULL.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_AppendTextString
+* \sa TTF_DeleteTextString
+* \sa TTF_InsertTextString
+*/
+TTF_SetTextString :: (text: *TTF_Text, _string: *u8, length: u64) -> bool #foreign libsdl3_ttf;
+
+/**
+* Insert UTF-8 text into a text object.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param offset the offset, in bytes, from the beginning of the string if >=
+*               0, the offset from the end of the string if < 0. Note that
+*               this does not do UTF-8 validation, so you should only insert
+*               at UTF-8 sequence boundaries.
+* \param string the UTF-8 text to insert.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_AppendTextString
+* \sa TTF_DeleteTextString
+* \sa TTF_SetTextString
+*/
+TTF_InsertTextString :: (text: *TTF_Text, offset: s32, _string: *u8, length: u64) -> bool #foreign libsdl3_ttf;
+
+/**
+* Append UTF-8 text to a text object.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param string the UTF-8 text to insert.
+* \param length the length of the text, in bytes, or 0 for null terminated
+*               text.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_DeleteTextString
+* \sa TTF_InsertTextString
+* \sa TTF_SetTextString
+*/
+TTF_AppendTextString :: (text: *TTF_Text, _string: *u8, length: u64) -> bool #foreign libsdl3_ttf;
+
+/**
+* Delete UTF-8 text from a text object.
+*
+* This function may cause the internal text representation to be rebuilt.
+*
+* \param text the TTF_Text to modify.
+* \param offset the offset, in bytes, from the beginning of the string if >=
+*               0, the offset from the end of the string if < 0. Note that
+*               this does not do UTF-8 validation, so you should only delete
+*               at UTF-8 sequence boundaries.
+* \param length the length of text to delete, in bytes, or -1 for the
+*               remainder of the string.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_AppendTextString
+* \sa TTF_InsertTextString
+* \sa TTF_SetTextString
+*/
+TTF_DeleteTextString :: (text: *TTF_Text, offset: s32, length: s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the size of a text object.
+*
+* The size of the text may change when the font or font style and size
+* change.
+*
+* \param text the TTF_Text to query.
+* \param w a pointer filled in with the width of the text, in pixels, may be
+*          NULL.
+* \param h a pointer filled in with the height of the text, in pixels, may be
+*          NULL.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextSize :: (text: *TTF_Text, w: *s32, h: *s32) -> bool #foreign libsdl3_ttf;
+
+/**
+* Flags for TTF_SubString
+*
+* \since This datatype is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_SubString
+*/
+TTF_SubStringFlags :: Uint32;
+
+/**
+* The representation of a substring within text.
+*
+* \since This struct is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_GetNextTextSubString
+* \sa TTF_GetPreviousTextSubString
+* \sa TTF_GetTextSubString
+* \sa TTF_GetTextSubStringForLine
+* \sa TTF_GetTextSubStringForPoint
+* \sa TTF_GetTextSubStringsForRange
+*/
+TTF_SubString :: struct {
+    flags:         TTF_SubStringFlags; /**< The flags for this substring */
+    offset:        s32; /**< The byte offset from the beginning of the text */
+    length:        s32; /**< The byte length starting at the offset */
+    line_index:    s32; /**< The index of the line that contains this substring */
+    cluster_index: s32; /**< The internal cluster index, used for quickly iterating */
+    rect:          SDL_Rect; /**< The rectangle, relative to the top left of the text, containing the substring */
+}
+
+/**
+* Get the substring of a text object that surrounds a text offset.
+*
+* If `offset` is less than 0, this will return a zero length substring at the
+* beginning of the text with the TTF_SUBSTRING_TEXT_START flag set. If
+* `offset` is greater than or equal to the length of the text string, this
+* will return a zero length substring at the end of the text with the
+* TTF_SUBSTRING_TEXT_END flag set.
+*
+* \param text the TTF_Text to query.
+* \param offset a byte offset into the text string.
+* \param substring a pointer filled in with the substring containing the
+*                  offset.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextSubString :: (text: *TTF_Text, offset: s32, substring: *TTF_SubString) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the substring of a text object that contains the given line.
+*
+* If `line` is less than 0, this will return a zero length substring at the
+* beginning of the text with the TTF_SUBSTRING_TEXT_START flag set. If `line`
+* is greater than or equal to `text->num_lines` this will return a zero
+* length substring at the end of the text with the TTF_SUBSTRING_TEXT_END
+* flag set.
+*
+* \param text the TTF_Text to query.
+* \param line a zero-based line index, in the range [0 .. text->num_lines-1].
+* \param substring a pointer filled in with the substring containing the
+*                  offset.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextSubStringForLine :: (text: *TTF_Text, line: s32, substring: *TTF_SubString) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the substrings of a text object that contain a range of text.
+*
+* \param text the TTF_Text to query.
+* \param offset a byte offset into the text string.
+* \param length the length of the range being queried, in bytes, or -1 for
+*               the remainder of the string.
+* \param count a pointer filled in with the number of substrings returned,
+*              may be NULL.
+* \returns a NULL terminated array of substring pointers or NULL on failure;
+*          call SDL_GetError() for more information. This is a single
+*          allocation that should be freed with SDL_free() when it is no
+*          longer needed.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextSubStringsForRange :: (text: *TTF_Text, offset: s32, length: s32, count: *s32) -> **TTF_SubString #foreign libsdl3_ttf;
+
+/**
+* Get the portion of a text string that is closest to a point.
+*
+* This will return the closest substring of text to the given point.
+*
+* \param text the TTF_Text to query.
+* \param x the x coordinate relative to the left side of the text, may be
+*          outside the bounds of the text area.
+* \param y the y coordinate relative to the top side of the text, may be
+*          outside the bounds of the text area.
+* \param substring a pointer filled in with the closest substring of text to
+*                  the given point.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetTextSubStringForPoint :: (text: *TTF_Text, x: s32, y: s32, substring: *TTF_SubString) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the previous substring in a text object
+*
+* If called at the start of the text, this will return a zero length
+* substring with the TTF_SUBSTRING_TEXT_START flag set.
+*
+* \param text the TTF_Text to query.
+* \param substring the TTF_SubString to query.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetPreviousTextSubString :: (text: *TTF_Text, substring: *TTF_SubString, previous: *TTF_SubString) -> bool #foreign libsdl3_ttf;
+
+/**
+* Get the next substring in a text object
+*
+* If called at the end of the text, this will return a zero length substring
+* with the TTF_SUBSTRING_TEXT_END flag set.
+*
+* \param text the TTF_Text to query.
+* \param substring the TTF_SubString to query.
+* \param next a pointer filled in with the next substring.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_GetNextTextSubString :: (text: *TTF_Text, substring: *TTF_SubString, next: *TTF_SubString) -> bool #foreign libsdl3_ttf;
+
+/**
+* Update the layout of a text object.
+*
+* This is automatically done when the layout is requested or the text is
+* rendered, but you can call this if you need more control over the timing of
+* when the layout and text engine representation are updated.
+*
+* \param text the TTF_Text to update.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_UpdateText :: (text: *TTF_Text) -> bool #foreign libsdl3_ttf;
+
+/**
+* Destroy a text object created by a text engine.
+*
+* \param text the text to destroy.
+*
+* \threadsafety This function should be called on the thread that created the
+*               text.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_CreateText
+*/
+TTF_DestroyText :: (text: *TTF_Text) -> void #foreign libsdl3_ttf;
+
+/**
+* Dispose of a previously-created font.
+*
+* Call this when done with a font. This function will free any resources
+* associated with it. It is safe to call this function on NULL, for example
+* on the result of a failed call to TTF_OpenFont().
+*
+* The font is not valid after being passed to this function. String pointers
+* from functions that return information on this font, such as
+* TTF_GetFontFamilyName() and TTF_GetFontStyleName(), are no longer valid
+* after this call, as well.
+*
+* \param font the font to dispose of.
+*
+* \threadsafety This function should not be called while any other thread is
+*               using the font.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_OpenFont
+* \sa TTF_OpenFontIO
+*/
+TTF_CloseFont :: (font: *TTF_Font) -> void #foreign libsdl3_ttf;
+
+/**
+* Deinitialize SDL_ttf.
+*
+* You must call this when done with the library, to free internal resources.
+* It is safe to call this when the library isn't initialized, as it will just
+* return immediately.
+*
+* Once you have as many quit calls as you have had successful calls to
+* TTF_Init, the library will actually deinitialize.
+*
+* Please note that this does not automatically close any fonts that are still
+* open at the time of deinitialization, and it is possibly not safe to close
+* them afterwards, as parts of the library will no longer be initialized to
+* deal with it. A well-written program should call TTF_CloseFont() on any
+* open fonts before calling this function!
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*/
+TTF_Quit :: () -> void #foreign libsdl3_ttf;
+
+/**
+* Check if SDL_ttf is initialized.
+*
+* This reports the number of times the library has been initialized by a call
+* to TTF_Init(), without a paired deinitialization request from TTF_Quit().
+*
+* In short: if it's greater than zero, the library is currently initialized
+* and ready to work. If zero, it is not initialized.
+*
+* Despite the return value being a signed integer, this function should not
+* return a negative number.
+*
+* \returns the current number of initialization calls, that need to
+*          eventually be paired with this many calls to TTF_Quit().
+*
+* \threadsafety It is safe to call this function from any thread.
+*
+* \since This function is available since SDL_ttf 3.0.0.
+*
+* \sa TTF_Init
+* \sa TTF_Quit
+*/
+TTF_WasInit :: () -> s32 #foreign libsdl3_ttf;
+
+/**
+* This function gets the version of the dynamically linked SDL_image library.
+*
+* \returns SDL_image version.
+*
+* \since This function is available since SDL_image 3.0.0.
+*/
+IMG_Version :: () -> s32 #foreign libsdl3_image;
+
+/**
+* Load an image from an SDL data source into a software surface.
+*
+* An SDL_Surface is a buffer of pixels in memory accessible by the CPU. Use
+* this if you plan to hand the data to something else or manipulate it
+* further in code.
+*
+* There are no guarantees about what format the new SDL_Surface data will be;
+* in many cases, SDL_image will attempt to supply a surface that exactly
+* matches the provided image, but in others it might have to convert (either
+* because the image is in a format that SDL doesn't directly support or
+* because it's compressed data that could reasonably uncompress to various
+* formats and SDL_image had to pick one). You can inspect an SDL_Surface for
+* its specifics, and use SDL_ConvertSurface to then migrate to any supported
+* format.
+*
+* If the image format supports a transparent pixel, SDL will set the colorkey
+* for the surface. You can enable RLE acceleration on the surface afterwards
+* by calling: SDL_SetSurfaceColorKey(image, SDL_RLEACCEL,
+* image->format->colorkey);
+*
+* If `closeio` is true, `src` will be closed before returning, whether this
+* function succeeds or not. SDL_image reads everything it needs from `src`
+* during this call in any case.
+*
+* Even though this function accepts a file type, SDL_image may still try
+* other decoders that are capable of detecting file type from the contents of
+* the image data, but may rely on the caller-provided type string for formats
+* that it cannot autodetect. If `type` is NULL, SDL_image will rely solely on
+* its ability to guess the format.
+*
+* There is a separate function to read files from disk without having to deal
+* with SDL_IOStream: `IMG_Load("filename.jpg")` will call this function and
+* manage those details for you, determining the file type from the filename's
+* extension.
+*
+* There is also IMG_Load_IO(), which is equivalent to this function except
+* that it will rely on SDL_image to determine what type of data it is
+* loading, much like passing a NULL for type.
+*
+* If you are using SDL's 2D rendering API, there is an equivalent call to
+* load images directly into an SDL_Texture for use by the GPU without using a
+* software surface: call IMG_LoadTextureTyped_IO() instead.
+*
+* When done with the returned surface, the app should dispose of it with a
+* call to SDL_DestroySurface().
+*
+* \param src an SDL_IOStream that data will be read from.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \param type a filename extension that represent this data ("BMP", "GIF",
+*             "PNG", etc).
+* \returns a new SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_Load
+* \sa IMG_Load_IO
+* \sa SDL_DestroySurface
+*/
+IMG_LoadTyped_IO :: (src: *SDL_IOStream, closeio: bool, type: *u8) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load an image from a filesystem path into a software surface.
+*
+* An SDL_Surface is a buffer of pixels in memory accessible by the CPU. Use
+* this if you plan to hand the data to something else or manipulate it
+* further in code.
+*
+* There are no guarantees about what format the new SDL_Surface data will be;
+* in many cases, SDL_image will attempt to supply a surface that exactly
+* matches the provided image, but in others it might have to convert (either
+* because the image is in a format that SDL doesn't directly support or
+* because it's compressed data that could reasonably uncompress to various
+* formats and SDL_image had to pick one). You can inspect an SDL_Surface for
+* its specifics, and use SDL_ConvertSurface to then migrate to any supported
+* format.
+*
+* If the image format supports a transparent pixel, SDL will set the colorkey
+* for the surface. You can enable RLE acceleration on the surface afterwards
+* by calling: SDL_SetSurfaceColorKey(image, SDL_RLEACCEL,
+* image->format->colorkey);
+*
+* There is a separate function to read files from an SDL_IOStream, if you
+* need an i/o abstraction to provide data from anywhere instead of a simple
+* filesystem read; that function is IMG_Load_IO().
+*
+* If you are using SDL's 2D rendering API, there is an equivalent call to
+* load images directly into an SDL_Texture for use by the GPU without using a
+* software surface: call IMG_LoadTexture() instead.
+*
+* When done with the returned surface, the app should dispose of it with a
+* call to
+* [SDL_DestroySurface](https://wiki.libsdl.org/SDL3/SDL_DestroySurface)
+* ().
+*
+* \param file a path on the filesystem to load an image from.
+* \returns a new SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadTyped_IO
+* \sa IMG_Load_IO
+* \sa SDL_DestroySurface
+*/
+IMG_Load :: (file: *u8) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load an image from an SDL data source into a software surface.
+*
+* An SDL_Surface is a buffer of pixels in memory accessible by the CPU. Use
+* this if you plan to hand the data to something else or manipulate it
+* further in code.
+*
+* There are no guarantees about what format the new SDL_Surface data will be;
+* in many cases, SDL_image will attempt to supply a surface that exactly
+* matches the provided image, but in others it might have to convert (either
+* because the image is in a format that SDL doesn't directly support or
+* because it's compressed data that could reasonably uncompress to various
+* formats and SDL_image had to pick one). You can inspect an SDL_Surface for
+* its specifics, and use SDL_ConvertSurface to then migrate to any supported
+* format.
+*
+* If the image format supports a transparent pixel, SDL will set the colorkey
+* for the surface. You can enable RLE acceleration on the surface afterwards
+* by calling: SDL_SetSurfaceColorKey(image, SDL_RLEACCEL,
+* image->format->colorkey);
+*
+* If `closeio` is true, `src` will be closed before returning, whether this
+* function succeeds or not. SDL_image reads everything it needs from `src`
+* during this call in any case.
+*
+* There is a separate function to read files from disk without having to deal
+* with SDL_IOStream: `IMG_Load("filename.jpg")` will call this function and
+* manage those details for you, determining the file type from the filename's
+* extension.
+*
+* There is also IMG_LoadTyped_IO(), which is equivalent to this function
+* except a file extension (like "BMP", "JPG", etc) can be specified, in case
+* SDL_image cannot autodetect the file format.
+*
+* If you are using SDL's 2D rendering API, there is an equivalent call to
+* load images directly into an SDL_Texture for use by the GPU without using a
+* software surface: call IMG_LoadTexture_IO() instead.
+*
+* When done with the returned surface, the app should dispose of it with a
+* call to SDL_DestroySurface().
+*
+* \param src an SDL_IOStream that data will be read from.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \returns a new SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_Load
+* \sa IMG_LoadTyped_IO
+* \sa SDL_DestroySurface
+*/
+IMG_Load_IO :: (src: *SDL_IOStream, closeio: bool) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load an image from a filesystem path into a GPU texture.
+*
+* An SDL_Texture represents an image in GPU memory, usable by SDL's 2D Render
+* API. This can be significantly more efficient than using a CPU-bound
+* SDL_Surface if you don't need to manipulate the image directly after
+* loading it.
+*
+* If the loaded image has transparency or a colorkey, a texture with an alpha
+* channel will be created. Otherwise, SDL_image will attempt to create an
+* SDL_Texture in the most format that most reasonably represents the image
+* data (but in many cases, this will just end up being 32-bit RGB or 32-bit
+* RGBA).
+*
+* There is a separate function to read files from an SDL_IOStream, if you
+* need an i/o abstraction to provide data from anywhere instead of a simple
+* filesystem read; that function is IMG_LoadTexture_IO().
+*
+* If you would rather decode an image to an SDL_Surface (a buffer of pixels
+* in CPU memory), call IMG_Load() instead.
+*
+* When done with the returned texture, the app should dispose of it with a
+* call to SDL_DestroyTexture().
+*
+* \param renderer the SDL_Renderer to use to create the GPU texture.
+* \param file a path on the filesystem to load an image from.
+* \returns a new texture, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadTextureTyped_IO
+* \sa IMG_LoadTexture_IO
+*/
+IMG_LoadTexture :: (renderer: *SDL_Renderer, file: *u8) -> *SDL_Texture #foreign libsdl3_image;
+
+/**
+* Load an image from an SDL data source into a GPU texture.
+*
+* An SDL_Texture represents an image in GPU memory, usable by SDL's 2D Render
+* API. This can be significantly more efficient than using a CPU-bound
+* SDL_Surface if you don't need to manipulate the image directly after
+* loading it.
+*
+* If the loaded image has transparency or a colorkey, a texture with an alpha
+* channel will be created. Otherwise, SDL_image will attempt to create an
+* SDL_Texture in the most format that most reasonably represents the image
+* data (but in many cases, this will just end up being 32-bit RGB or 32-bit
+* RGBA).
+*
+* If `closeio` is true, `src` will be closed before returning, whether this
+* function succeeds or not. SDL_image reads everything it needs from `src`
+* during this call in any case.
+*
+* There is a separate function to read files from disk without having to deal
+* with SDL_IOStream: `IMG_LoadTexture(renderer, "filename.jpg")` will call
+* this function and manage those details for you, determining the file type
+* from the filename's extension.
+*
+* There is also IMG_LoadTextureTyped_IO(), which is equivalent to this
+* function except a file extension (like "BMP", "JPG", etc) can be specified,
+* in case SDL_image cannot autodetect the file format.
+*
+* If you would rather decode an image to an SDL_Surface (a buffer of pixels
+* in CPU memory), call IMG_Load() instead.
+*
+* When done with the returned texture, the app should dispose of it with a
+* call to SDL_DestroyTexture().
+*
+* \param renderer the SDL_Renderer to use to create the GPU texture.
+* \param src an SDL_IOStream that data will be read from.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \returns a new texture, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadTexture
+* \sa IMG_LoadTextureTyped_IO
+* \sa SDL_DestroyTexture
+*/
+IMG_LoadTexture_IO :: (renderer: *SDL_Renderer, src: *SDL_IOStream, closeio: bool) -> *SDL_Texture #foreign libsdl3_image;
+
+/**
+* Load an image from an SDL data source into a GPU texture.
+*
+* An SDL_Texture represents an image in GPU memory, usable by SDL's 2D Render
+* API. This can be significantly more efficient than using a CPU-bound
+* SDL_Surface if you don't need to manipulate the image directly after
+* loading it.
+*
+* If the loaded image has transparency or a colorkey, a texture with an alpha
+* channel will be created. Otherwise, SDL_image will attempt to create an
+* SDL_Texture in the most format that most reasonably represents the image
+* data (but in many cases, this will just end up being 32-bit RGB or 32-bit
+* RGBA).
+*
+* If `closeio` is true, `src` will be closed before returning, whether this
+* function succeeds or not. SDL_image reads everything it needs from `src`
+* during this call in any case.
+*
+* Even though this function accepts a file type, SDL_image may still try
+* other decoders that are capable of detecting file type from the contents of
+* the image data, but may rely on the caller-provided type string for formats
+* that it cannot autodetect. If `type` is NULL, SDL_image will rely solely on
+* its ability to guess the format.
+*
+* There is a separate function to read files from disk without having to deal
+* with SDL_IOStream: `IMG_LoadTexture("filename.jpg")` will call this
+* function and manage those details for you, determining the file type from
+* the filename's extension.
+*
+* There is also IMG_LoadTexture_IO(), which is equivalent to this function
+* except that it will rely on SDL_image to determine what type of data it is
+* loading, much like passing a NULL for type.
+*
+* If you would rather decode an image to an SDL_Surface (a buffer of pixels
+* in CPU memory), call IMG_LoadTyped_IO() instead.
+*
+* When done with the returned texture, the app should dispose of it with a
+* call to SDL_DestroyTexture().
+*
+* \param renderer the SDL_Renderer to use to create the GPU texture.
+* \param src an SDL_IOStream that data will be read from.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \param type a filename extension that represent this data ("BMP", "GIF",
+*             "PNG", etc).
+* \returns a new texture, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadTexture
+* \sa IMG_LoadTexture_IO
+* \sa SDL_DestroyTexture
+*/
+IMG_LoadTextureTyped_IO :: (renderer: *SDL_Renderer, src: *SDL_IOStream, closeio: bool, type: *u8) -> *SDL_Texture #foreign libsdl3_image;
+
+/**
+* Detect AVIF image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is AVIF data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isAVIF :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect ICO image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is ICO data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isICO :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect CUR image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is CUR data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isCUR :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect BMP image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is BMP data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isBMP :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect GIF image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is GIF data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isGIF :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect JPG image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is JPG data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isJPG :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect JXL image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is JXL data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isJXL :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect LBM image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is LBM data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isLBM :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect PCX image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is PCX data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isPCX :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect PNG image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is PNG data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isPNG :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect PNM image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is PNM data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isPNM :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect SVG image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is SVG data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isSVG :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect QOI image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is QOI data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isQOI :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect TIFF image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is TIFF data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isTIF :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect XCF image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is XCF data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isXCF :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect XPM image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is XPM data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXV
+* \sa IMG_isWEBP
+*/
+IMG_isXPM :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect XV image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is XV data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isWEBP
+*/
+IMG_isXV :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Detect WEBP image data on a readable/seekable SDL_IOStream.
+*
+* This function attempts to determine if a file is a given filetype, reading
+* the least amount possible from the SDL_IOStream (usually a few bytes).
+*
+* There is no distinction made between "not the filetype in question" and
+* basic i/o errors.
+*
+* This function will always attempt to seek `src` back to where it started
+* when this function was called, but it will not report any errors in doing
+* so, but assuming seeking works, this means you can immediately use this
+* with a different IMG_isTYPE function, or load the image without further
+* seeking.
+*
+* You do not need to call this function to load data; SDL_image can work to
+* determine file type in many cases in its standard load functions.
+*
+* \param src a seekable/readable SDL_IOStream to provide image data.
+* \returns non-zero if this is WEBP data, zero otherwise.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_isAVIF
+* \sa IMG_isICO
+* \sa IMG_isCUR
+* \sa IMG_isBMP
+* \sa IMG_isGIF
+* \sa IMG_isJPG
+* \sa IMG_isJXL
+* \sa IMG_isLBM
+* \sa IMG_isPCX
+* \sa IMG_isPNG
+* \sa IMG_isPNM
+* \sa IMG_isSVG
+* \sa IMG_isQOI
+* \sa IMG_isTIF
+* \sa IMG_isXCF
+* \sa IMG_isXPM
+* \sa IMG_isXV
+*/
+IMG_isWEBP :: (src: *SDL_IOStream) -> bool #foreign libsdl3_image;
+
+/**
+* Load a AVIF image directly.
+*
+* If you know you definitely have a AVIF image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadAVIF_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a ICO image directly.
+*
+* If you know you definitely have a ICO image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadICO_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a CUR image directly.
+*
+* If you know you definitely have a CUR image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadCUR_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a BMP image directly.
+*
+* If you know you definitely have a BMP image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadBMP_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a GIF image directly.
+*
+* If you know you definitely have a GIF image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadGIF_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a JPG image directly.
+*
+* If you know you definitely have a JPG image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadJPG_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a JXL image directly.
+*
+* If you know you definitely have a JXL image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadJXL_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a LBM image directly.
+*
+* If you know you definitely have a LBM image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadLBM_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a PCX image directly.
+*
+* If you know you definitely have a PCX image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadPCX_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a PNG image directly.
+*
+* If you know you definitely have a PNG image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadPNG_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a PNM image directly.
+*
+* If you know you definitely have a PNM image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadPNM_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a SVG image directly.
+*
+* If you know you definitely have a SVG image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadSVG_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a QOI image directly.
+*
+* If you know you definitely have a QOI image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadQOI_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a TGA image directly.
+*
+* If you know you definitely have a TGA image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadTGA_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a TIFF image directly.
+*
+* If you know you definitely have a TIFF image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadTIF_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a XCF image directly.
+*
+* If you know you definitely have a XCF image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadXCF_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a XPM image directly.
+*
+* If you know you definitely have a XPM image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXV_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadXPM_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a XV image directly.
+*
+* If you know you definitely have a XV image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadWEBP_IO
+*/
+IMG_LoadXV_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load a WEBP image directly.
+*
+* If you know you definitely have a WEBP image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream to load image data from.
+* \returns SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAVIF_IO
+* \sa IMG_LoadICO_IO
+* \sa IMG_LoadCUR_IO
+* \sa IMG_LoadBMP_IO
+* \sa IMG_LoadGIF_IO
+* \sa IMG_LoadJPG_IO
+* \sa IMG_LoadJXL_IO
+* \sa IMG_LoadLBM_IO
+* \sa IMG_LoadPCX_IO
+* \sa IMG_LoadPNG_IO
+* \sa IMG_LoadPNM_IO
+* \sa IMG_LoadSVG_IO
+* \sa IMG_LoadQOI_IO
+* \sa IMG_LoadTGA_IO
+* \sa IMG_LoadTIF_IO
+* \sa IMG_LoadXCF_IO
+* \sa IMG_LoadXPM_IO
+* \sa IMG_LoadXV_IO
+*/
+IMG_LoadWEBP_IO :: (src: *SDL_IOStream) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load an SVG image, scaled to a specific size.
+*
+* Since SVG files are resolution-independent, you specify the size you would
+* like the output image to be and it will be generated at those dimensions.
+*
+* Either width or height may be 0 and the image will be auto-sized to
+* preserve aspect ratio.
+*
+* When done with the returned surface, the app should dispose of it with a
+* call to SDL_DestroySurface().
+*
+* \param src an SDL_IOStream to load SVG data from.
+* \param width desired width of the generated surface, in pixels.
+* \param height desired height of the generated surface, in pixels.
+* \returns a new SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*/
+IMG_LoadSizedSVG_IO :: (src: *SDL_IOStream, width: s32, height: s32) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load an XPM image from a memory array.
+*
+* The returned surface will be an 8bpp indexed surface, if possible,
+* otherwise it will be 32bpp. If you always want 32-bit data, use
+* IMG_ReadXPMFromArrayToRGB888() instead.
+*
+* When done with the returned surface, the app should dispose of it with a
+* call to SDL_DestroySurface().
+*
+* \param xpm a null-terminated array of strings that comprise XPM data.
+* \returns a new SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_ReadXPMFromArrayToRGB888
+*/
+IMG_ReadXPMFromArray :: (xpm: **u8) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Load an XPM image from a memory array.
+*
+* The returned surface will always be a 32-bit RGB surface. If you want 8-bit
+* indexed colors (and the XPM data allows it), use IMG_ReadXPMFromArray()
+* instead.
+*
+* When done with the returned surface, the app should dispose of it with a
+* call to SDL_DestroySurface().
+*
+* \param xpm a null-terminated array of strings that comprise XPM data.
+* \returns a new SDL surface, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_ReadXPMFromArray
+*/
+IMG_ReadXPMFromArrayToRGB888 :: (xpm: **u8) -> *SDL_Surface #foreign libsdl3_image;
+
+/**
+* Save an SDL_Surface into a AVIF image file.
+*
+* If the file already exists, it will be overwritten.
+*
+* \param surface the SDL surface to save.
+* \param file path on the filesystem to write new file to.
+* \param quality the desired quality, ranging between 0 (lowest) and 100
+*                (highest).
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_SaveAVIF_IO
+*/
+IMG_SaveAVIF :: (surface: *SDL_Surface, file: *u8, quality: s32) -> bool #foreign libsdl3_image;
+
+/**
+* Save an SDL_Surface into AVIF image data, via an SDL_IOStream.
+*
+* If you just want to save to a filename, you can use IMG_SaveAVIF() instead.
+*
+* If `closeio` is true, `dst` will be closed before returning, whether this
+* function succeeds or not.
+*
+* \param surface the SDL surface to save.
+* \param dst the SDL_IOStream to save the image data to.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \param quality the desired quality, ranging between 0 (lowest) and 100
+*                (highest).
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_SaveAVIF
+*/
+IMG_SaveAVIF_IO :: (surface: *SDL_Surface, dst: *SDL_IOStream, closeio: bool, quality: s32) -> bool #foreign libsdl3_image;
+
+/**
+* Save an SDL_Surface into a PNG image file.
+*
+* If the file already exists, it will be overwritten.
+*
+* \param surface the SDL surface to save.
+* \param file path on the filesystem to write new file to.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_SavePNG_IO
+*/
+IMG_SavePNG :: (surface: *SDL_Surface, file: *u8) -> bool #foreign libsdl3_image;
+
+/**
+* Save an SDL_Surface into PNG image data, via an SDL_IOStream.
+*
+* If you just want to save to a filename, you can use IMG_SavePNG() instead.
+*
+* If `closeio` is true, `dst` will be closed before returning, whether this
+* function succeeds or not.
+*
+* \param surface the SDL surface to save.
+* \param dst the SDL_IOStream to save the image data to.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_SavePNG
+*/
+IMG_SavePNG_IO :: (surface: *SDL_Surface, dst: *SDL_IOStream, closeio: bool) -> bool #foreign libsdl3_image;
+
+/**
+* Save an SDL_Surface into a JPEG image file.
+*
+* If the file already exists, it will be overwritten.
+*
+* \param surface the SDL surface to save.
+* \param file path on the filesystem to write new file to.
+* \param quality [0; 33] is Lowest quality, [34; 66] is Middle quality, [67;
+*                100] is Highest quality.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_SaveJPG_IO
+*/
+IMG_SaveJPG :: (surface: *SDL_Surface, file: *u8, quality: s32) -> bool #foreign libsdl3_image;
+
+/**
+* Save an SDL_Surface into JPEG image data, via an SDL_IOStream.
+*
+* If you just want to save to a filename, you can use IMG_SaveJPG() instead.
+*
+* If `closeio` is true, `dst` will be closed before returning, whether this
+* function succeeds or not.
+*
+* \param surface the SDL surface to save.
+* \param dst the SDL_IOStream to save the image data to.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \param quality [0; 33] is Lowest quality, [34; 66] is Middle quality, [67;
+*                100] is Highest quality.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_SaveJPG
+*/
+IMG_SaveJPG_IO :: (surface: *SDL_Surface, dst: *SDL_IOStream, closeio: bool, quality: s32) -> bool #foreign libsdl3_image;
+
+/**
+* Animated image support
+*
+* Currently only animated GIFs and WEBP images are supported.
+*/
+IMG_Animation :: struct {
+    w:      s32;
+    h:      s32;
+    count:  s32;
+    frames: **SDL_Surface;
+    delays: *s32;
+}
+
+/**
+* Load an animation from a file.
+*
+* When done with the returned animation, the app should dispose of it with a
+* call to IMG_FreeAnimation().
+*
+* \param file path on the filesystem containing an animated image.
+* \returns a new IMG_Animation, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_FreeAnimation
+*/
+IMG_LoadAnimation :: (file: *u8) -> *IMG_Animation #foreign libsdl3_image;
+
+/**
+* Load an animation from an SDL_IOStream.
+*
+* If `closeio` is true, `src` will be closed before returning, whether this
+* function succeeds or not. SDL_image reads everything it needs from `src`
+* during this call in any case.
+*
+* When done with the returned animation, the app should dispose of it with a
+* call to IMG_FreeAnimation().
+*
+* \param src an SDL_IOStream that data will be read from.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \returns a new IMG_Animation, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_FreeAnimation
+*/
+IMG_LoadAnimation_IO :: (src: *SDL_IOStream, closeio: bool) -> *IMG_Animation #foreign libsdl3_image;
+
+/**
+* Load an animation from an SDL datasource
+*
+* Even though this function accepts a file type, SDL_image may still try
+* other decoders that are capable of detecting file type from the contents of
+* the image data, but may rely on the caller-provided type string for formats
+* that it cannot autodetect. If `type` is NULL, SDL_image will rely solely on
+* its ability to guess the format.
+*
+* If `closeio` is true, `src` will be closed before returning, whether this
+* function succeeds or not. SDL_image reads everything it needs from `src`
+* during this call in any case.
+*
+* When done with the returned animation, the app should dispose of it with a
+* call to IMG_FreeAnimation().
+*
+* \param src an SDL_IOStream that data will be read from.
+* \param closeio true to close/free the SDL_IOStream before returning, false
+*                to leave it open.
+* \param type a filename extension that represent this data ("GIF", etc).
+* \returns a new IMG_Animation, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAnimation
+* \sa IMG_LoadAnimation_IO
+* \sa IMG_FreeAnimation
+*/
+IMG_LoadAnimationTyped_IO :: (src: *SDL_IOStream, closeio: bool, type: *u8) -> *IMG_Animation #foreign libsdl3_image;
+
+/**
+* Dispose of an IMG_Animation and free its resources.
+*
+* The provided `anim` pointer is not valid once this call returns.
+*
+* \param anim IMG_Animation to dispose of.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAnimation
+* \sa IMG_LoadAnimation_IO
+* \sa IMG_LoadAnimationTyped_IO
+*/
+IMG_FreeAnimation :: (anim: *IMG_Animation) -> void #foreign libsdl3_image;
+
+/**
+* Load a GIF animation directly.
+*
+* If you know you definitely have a GIF image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream that data will be read from.
+* \returns a new IMG_Animation, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAnimation
+* \sa IMG_LoadAnimation_IO
+* \sa IMG_LoadAnimationTyped_IO
+* \sa IMG_FreeAnimation
+*/
+IMG_LoadGIFAnimation_IO :: (src: *SDL_IOStream) -> *IMG_Animation #foreign libsdl3_image;
+
+/**
+* Load a WEBP animation directly.
+*
+* If you know you definitely have a WEBP image, you can call this function,
+* which will skip SDL_image's file format detection routines. Generally it's
+* better to use the abstract interfaces; also, there is only an SDL_IOStream
+* interface available here.
+*
+* \param src an SDL_IOStream that data will be read from.
+* \returns a new IMG_Animation, or NULL on error.
+*
+* \since This function is available since SDL_image 3.0.0.
+*
+* \sa IMG_LoadAnimation
+* \sa IMG_LoadAnimation_IO
+* \sa IMG_LoadAnimationTyped_IO
+* \sa IMG_FreeAnimation
+*/
+IMG_LoadWEBPAnimation_IO :: (src: *SDL_IOStream) -> *IMG_Animation #foreign libsdl3_image;
+
+/**
+* Dynamically load the Vulkan loader library.
+*
+* This should be called after initializing the video driver, but before
+* creating any Vulkan windows. If no Vulkan loader library is loaded, the
+* default library will be loaded upon creation of the first Vulkan window.
+*
+* SDL keeps a counter of how many times this function has been successfully
+* called, so it is safe to call this function multiple times, so long as it
+* is eventually paired with an equivalent number of calls to
+* SDL_Vulkan_UnloadLibrary. The `path` argument is ignored unless there is no
+* library currently loaded, and and the library isn't actually unloaded until
+* there have been an equivalent number of calls to SDL_Vulkan_UnloadLibrary.
+*
+* It is fairly common for Vulkan applications to link with libvulkan instead
+* of explicitly loading it at run time. This will work with SDL provided the
+* application links to a dynamic library and both it and SDL use the same
+* search path.
+*
+* If you specify a non-NULL `path`, an application should retrieve all of the
+* Vulkan functions it uses from the dynamic library using
+* SDL_Vulkan_GetVkGetInstanceProcAddr unless you can guarantee `path` points
+* to the same vulkan loader library the application linked to.
+*
+* On Apple devices, if `path` is NULL, SDL will attempt to find the
+* `vkGetInstanceProcAddr` address within all the Mach-O images of the current
+* process. This is because it is fairly common for Vulkan applications to
+* link with libvulkan (and historically MoltenVK was provided as a static
+* library). If it is not found, on macOS, SDL will attempt to load
+* `vulkan.framework/vulkan`, `libvulkan.1.dylib`,
+* `MoltenVK.framework/MoltenVK`, and `libMoltenVK.dylib`, in that order. On
+* iOS, SDL will attempt to load `libMoltenVK.dylib`. Applications using a
+* dynamic framework or .dylib must ensure it is included in its application
+* bundle.
+*
+* On non-Apple devices, application linking with a static libvulkan is not
+* supported. Either do not link to the Vulkan loader or link to a dynamic
+* library version.
+*
+* \param path the platform dependent Vulkan loader library name or NULL.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \threadsafety This function is not thread safe.
+*
+* \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_Vulkan_GetVkGetInstanceProcAddr
+* \sa SDL_Vulkan_UnloadLibrary
+*/
+SDL_Vulkan_LoadLibrary :: (path: *u8) -> bool #foreign libsdl3;
+
+/**
+* Get the address of the `vkGetInstanceProcAddr` function.
+*
+* This should be called after either calling SDL_Vulkan_LoadLibrary() or
+* creating an SDL_Window with the `SDL_WINDOW_VULKAN` flag.
+*
+* The actual type of the returned function pointer is
+* PFN_vkGetInstanceProcAddr, but that isn't available because the Vulkan
+* headers are not included here. You should cast the return value of this
+* function to that type, e.g.
+*
+* `vkGetInstanceProcAddr =
+* (PFN_vkGetInstanceProcAddr)SDL_Vulkan_GetVkGetInstanceProcAddr();`
+*
+* \returns the function pointer for `vkGetInstanceProcAddr` or NULL on
+*          failure; call SDL_GetError() for more information.
+*
+* \since This function is available since SDL 3.2.0.
+*/
+SDL_Vulkan_GetVkGetInstanceProcAddr :: () -> SDL_FunctionPointer #foreign libsdl3;
+
+/**
+* Unload the Vulkan library previously loaded by SDL_Vulkan_LoadLibrary().
+*
+* SDL keeps a counter of how many times this function has been called, so it
+* is safe to call this function multiple times, so long as it is paired with
+* an equivalent number of calls to SDL_Vulkan_LoadLibrary. The library isn't
+* actually unloaded until there have been an equivalent number of calls to
+* SDL_Vulkan_UnloadLibrary.
+*
+* Once the library has actually been unloaded, if any Vulkan instances
+* remain, they will likely crash the program. Clean up any existing Vulkan
+* resources, and destroy appropriate windows, renderers and GPU devices
+* before calling this function.
+*
+* \threadsafety This function is not thread safe.
+*
+* \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_Vulkan_LoadLibrary
+*/
+SDL_Vulkan_UnloadLibrary :: () -> void #foreign libsdl3;
+
+/**
+* Get the Vulkan instance extensions needed for vkCreateInstance.
+*
+* This should be called after either calling SDL_Vulkan_LoadLibrary() or
+* creating an SDL_Window with the `SDL_WINDOW_VULKAN` flag.
+*
+* On return, the variable pointed to by `count` will be set to the number of
+* elements returned, suitable for using with
+* VkInstanceCreateInfo::enabledExtensionCount, and the returned array can be
+* used with VkInstanceCreateInfo::ppEnabledExtensionNames, for calling
+* Vulkan's vkCreateInstance API.
+*
+* You should not free the returned array; it is owned by SDL.
+*
+* \param count a pointer filled in with the number of extensions returned.
+* \returns an array of extension name strings on success, NULL on failure;
+*          call SDL_GetError() for more information.
+*
+* \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_Vulkan_CreateSurface
+*/
+SDL_Vulkan_GetInstanceExtensions :: (count: *Uint32) -> **u8 #foreign libsdl3;
+
+/**
+* Create a Vulkan rendering surface for a window.
+*
+* The `window` must have been created with the `SDL_WINDOW_VULKAN` flag and
+* `instance` must have been created with extensions returned by
+* SDL_Vulkan_GetInstanceExtensions() enabled.
+*
+* If `allocator` is NULL, Vulkan will use the system default allocator. This
+* argument is passed directly to Vulkan and isn't used by SDL itself.
+*
+* \param window the window to which to attach the Vulkan surface.
+* \param instance the Vulkan instance handle.
+* \param allocator a VkAllocationCallbacks struct, which lets the app set the
+*                  allocator that creates the surface. Can be NULL.
+* \param surface a pointer to a VkSurfaceKHR handle to output the newly
+*                created surface.
+* \returns true on success or false on failure; call SDL_GetError() for more
+*          information.
+*
+* \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_Vulkan_GetInstanceExtensions
+* \sa SDL_Vulkan_DestroySurface
+*/
+SDL_Vulkan_CreateSurface :: (window: *SDL_Window, instance: VkInstance, allocator: *VkAllocationCallbacks, surface: *VkSurfaceKHR) -> bool #foreign libsdl3;
+
+/**
+* Destroy the Vulkan rendering surface of a window.
+*
+* This should be called before SDL_DestroyWindow, if SDL_Vulkan_CreateSurface
+* was called after SDL_CreateWindow.
+*
+* The `instance` must have been created with extensions returned by
+* SDL_Vulkan_GetInstanceExtensions() enabled and `surface` must have been
+* created successfully by an SDL_Vulkan_CreateSurface() call.
+*
+* If `allocator` is NULL, Vulkan will use the system default allocator. This
+* argument is passed directly to Vulkan and isn't used by SDL itself.
+*
+* \param instance the Vulkan instance handle.
+* \param surface vkSurfaceKHR handle to destroy.
+* \param allocator a VkAllocationCallbacks struct, which lets the app set the
+*                  allocator that destroys the surface. Can be NULL.
+*
+* \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_Vulkan_GetInstanceExtensions
+* \sa SDL_Vulkan_CreateSurface
+*/
+SDL_Vulkan_DestroySurface :: (instance: VkInstance, surface: VkSurfaceKHR, allocator: *VkAllocationCallbacks) -> void #foreign libsdl3;
+
+/**
+* Query support for presentation via a given physical device and queue
+* family.
+*
+* The `instance` must have been created with extensions returned by
+* SDL_Vulkan_GetInstanceExtensions() enabled.
+*
+* \param instance the Vulkan instance handle.
+* \param physicalDevice a valid Vulkan physical device handle.
+* \param queueFamilyIndex a valid queue family index for the given physical
+*                         device.
+* \returns true if supported, false if unsupported or an error occurred.
+*
+* \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_Vulkan_GetInstanceExtensions
+*/
+SDL_Vulkan_GetPresentationSupport :: (instance: VkInstance, physicalDevice: VkPhysicalDevice, queueFamilyIndex: Uint32) -> bool #foreign libsdl3;
+
 #scope_file
 
 #import "Basic"; // For push_context
 
+#import "Vulkan";
 libsdl3 :: #library,system "libSDL3.so.0";
+libsdl3_image :: #library,system "libSDL3_image.so.0";
+libsdl3_ttf :: #library,system "libSDL3_ttf.so.0";
