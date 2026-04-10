@@ -48,8 +48,13 @@ EOF;
         opts.generate_library_declarations = false;
 
         array_add(*opts.libraries, .{filename="libSDL3.so.0"});
-        array_add(*opts.libraries, .{filename="libSDL3_image.so.0"});
-        array_add(*opts.libraries, .{filename="libSDL3_ttf.so.0"});
+        if image {
+            array_add(*opts.libraries, .{filename="libSDL3_image.so.0"});
+        }
+        if ttf {
+            array_add(*opts.libraries, .{filename="libSDL3_ttf.so.0"});
+        }
+
     } else #if OS == .MACOS {
         output_filename = "macos/macos.jai";
 
@@ -77,8 +82,12 @@ EOF;
 
         opts.generate_library_declarations = false;
         array_add(*opts.libraries, .{filename = "libSDL3"});
-        array_add(*opts.libraries, .{filename = "libSDL3_image"});
-        array_add(*opts.libraries, .{filename = "libSDL3_ttf"});
+        if image {
+            array_add(*opts.libraries, .{filename = "libSDL3_image"});
+        }
+        if ttf {
+            array_add(*opts.libraries, .{filename = "libSDL3_ttf"});
+        }
     } else {
         assert(false, "the OS % is currently unsupported. You might be able to add support for it though!", OS);
     }
