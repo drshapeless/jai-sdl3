@@ -622,8 +622,11 @@ SDL_PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN :: "SDL.gpu.device.create.shaders
 SDL_PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN :: "SDL.gpu.device.create.shaders.metallib";
 SDL_PROP_GPU_DEVICE_CREATE_D3D12_ALLOW_FEWER_RESOURCE_SLOTS_BOOLEAN :: "SDL.gpu.device.create.d3d12.allowtier1resourcebinding";
 SDL_PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING :: "SDL.gpu.device.create.d3d12.semantic";
+SDL_PROP_GPU_DEVICE_CREATE_D3D12_AGILITY_SDK_VERSION_NUMBER :: "SDL.gpu.device.create.d3d12.agility_sdk_version";
+SDL_PROP_GPU_DEVICE_CREATE_D3D12_AGILITY_SDK_PATH_STRING :: "SDL.gpu.device.create.d3d12.agility_sdk_path";
 SDL_PROP_GPU_DEVICE_CREATE_VULKAN_REQUIRE_HARDWARE_ACCELERATION_BOOLEAN :: "SDL.gpu.device.create.vulkan.requirehardwareacceleration";
 SDL_PROP_GPU_DEVICE_CREATE_VULKAN_OPTIONS_POINTER :: "SDL.gpu.device.create.vulkan.options";
+SDL_PROP_GPU_DEVICE_CREATE_METAL_ALLOW_MACFAMILY1_BOOLEAN :: "SDL.gpu.device.create.metal.allowmacfamily1";
 
 SDL_PROP_GPU_DEVICE_NAME_STRING :: "SDL.gpu.device.name";
 SDL_PROP_GPU_DEVICE_DRIVER_NAME_STRING :: "SDL.gpu.device.driver_name";
@@ -850,6 +853,8 @@ SDL_HINT_JOYSTICK_FLIGHTSTICK_DEVICES_EXCLUDED :: "SDL_JOYSTICK_FLIGHTSTICK_DEVI
 
 SDL_HINT_JOYSTICK_GAMEINPUT :: "SDL_JOYSTICK_GAMEINPUT";
 
+SDL_HINT_JOYSTICK_GAMEINPUT_RAW :: "SDL_JOYSTICK_GAMEINPUT_RAW";
+
 SDL_HINT_JOYSTICK_GAMECUBE_DEVICES :: "SDL_JOYSTICK_GAMECUBE_DEVICES";
 
 SDL_HINT_JOYSTICK_GAMECUBE_DEVICES_EXCLUDED :: "SDL_JOYSTICK_GAMECUBE_DEVICES_EXCLUDED";
@@ -1030,6 +1035,8 @@ SDL_HINT_EGL_LIBRARY :: "SDL_EGL_LIBRARY";
 
 SDL_HINT_OPENGL_ES_DRIVER :: "SDL_OPENGL_ES_DRIVER";
 
+SDL_HINT_OPENGL_FORCE_SRGB_FRAMEBUFFER :: "SDL_OPENGL_FORCE_SRGB_FRAMEBUFFER";
+
 SDL_HINT_OPENVR_LIBRARY :: "SDL_OPENVR_LIBRARY";
 
 SDL_HINT_ORIENTATIONS :: "SDL_ORIENTATIONS";
@@ -1197,6 +1204,8 @@ SDL_HINT_WINDOWS_GAMEINPUT :: "SDL_WINDOWS_GAMEINPUT";
 SDL_HINT_WINDOWS_RAW_KEYBOARD :: "SDL_WINDOWS_RAW_KEYBOARD";
 
 SDL_HINT_WINDOWS_RAW_KEYBOARD_EXCLUDE_HOTKEYS :: "SDL_WINDOWS_RAW_KEYBOARD_EXCLUDE_HOTKEYS";
+
+SDL_HINT_WINDOWS_RAW_KEYBOARD_INPUTSINK :: "SDL_WINDOWS_RAW_KEYBOARD_INPUTSINK";
 
 SDL_HINT_WINDOWS_FORCE_SEMAPHORE_KERNEL :: "SDL_WINDOWS_FORCE_SEMAPHORE_KERNEL";
 
@@ -1388,9 +1397,9 @@ SDL_TRAYENTRY_CHECKED :: 0x40000000;
 
 SDL_MAJOR_VERSION :: 3;
 
-SDL_MINOR_VERSION :: 5;
+SDL_MINOR_VERSION :: 4;
 
-SDL_MICRO_VERSION :: 0;
+SDL_MICRO_VERSION :: 4;
 
 /**
 * A signed 8-bit integer type.
@@ -1939,6 +1948,8 @@ SDL_DestroyEnvironment :: (env: *SDL_Environment) -> void #foreign libsdl3;
 /**
 * Get the value of a variable in the environment.
 *
+* The name of the variable is case sensitive on all platforms.
+*
 * This function uses SDL's cached copy of the environment and is thread-safe.
 *
 * \param name the name of the variable to get.
@@ -1956,6 +1967,11 @@ SDL_getenv :: (name: *u8) -> *u8 #foreign libsdl3;
 *
 * This function bypasses SDL's cached copy of the environment and is not
 * thread-safe.
+*
+* On some platforms, this may make case-insensitive matches, while other
+* platforms are case-sensitive. It is best to be precise with strings used
+* for queries through this interface. SDL_getenv is always case-sensitive,
+* however.
 *
 * \param name the name of the variable to get.
 * \returns a pointer to the value of the variable or NULL if it can't be
@@ -5687,6 +5703,8 @@ SDL_iconv_t :: *SDL_iconv_data_t;
 * \returns a handle that must be freed with SDL_iconv_close, or
 *          SDL_ICONV_ERROR on failure.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_iconv
@@ -5700,6 +5718,8 @@ SDL_iconv_open :: (tocode: *u8, fromcode: *u8) -> SDL_iconv_t #foreign libsdl3;
 *
 * \param cd The character set conversion handle.
 * \returns 0 on success, or -1 on failure.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -5739,6 +5759,8 @@ SDL_iconv_close :: (cd: SDL_iconv_t) -> s32 #foreign libsdl3;
 * \param outbytesleft The number of bytes in the output buffer.
 * \returns the number of conversions on success, or a negative error code.
 *
+* \threadsafety Do not use the same SDL_iconv_t from two threads at once.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_iconv_open
@@ -5765,6 +5787,8 @@ SDL_iconv :: (cd: SDL_iconv_t, inbuf: **u8, inbytesleft: *u64, outbuf: **u8, out
 * \param inbuf the string to convert to a different encoding.
 * \param inbytesleft the size of the input string _in bytes_.
 * \returns a new string, converted to the new encoding, or NULL on error.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -6055,6 +6079,8 @@ SDL_AsyncIOQueue :: struct {}
 *             the file.
 * \returns a pointer to the SDL_AsyncIO structure that is created or NULL on
 *          failure; call SDL_GetError() for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -6373,6 +6399,8 @@ SDL_SignalAsyncIOQueue :: (queue: *SDL_AsyncIOQueue) -> void #foreign libsdl3;
 *                 results.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -6901,6 +6929,8 @@ SDL_PropertyType :: enum u32 {
 *
 * \returns a valid property ID on success or 0 on failure; call
 *          SDL_GetError() for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -7448,6 +7478,8 @@ SDL_ThreadFunction :: #type (data: *void) -> s32 #c_call;
 *          new thread could not be created; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_CreateThreadRuntime :: (fn: SDL_ThreadFunction, name: *u8, data: *void, pfnBeginThread: SDL_FunctionPointer, pfnEndThread: SDL_FunctionPointer) -> *SDL_Thread #foreign libsdl3;
@@ -7462,6 +7494,8 @@ SDL_CreateThreadRuntime :: (fn: SDL_ThreadFunction, name: *u8, data: *void, pfnB
 *          new thread could not be created; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_CreateThreadWithPropertiesRuntime :: (props: SDL_PropertiesID, pfnBeginThread: SDL_FunctionPointer, pfnEndThread: SDL_FunctionPointer) -> *SDL_Thread #foreign libsdl3;
@@ -7472,6 +7506,8 @@ SDL_CreateThreadWithPropertiesRuntime :: (props: SDL_PropertiesID, pfnBeginThrea
 * \param thread the thread to query.
 * \returns a pointer to a UTF-8 string that names the specified thread, or
 *          NULL if it doesn't have a name.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -7488,6 +7524,8 @@ SDL_GetThreadName :: (thread: *SDL_Thread) -> *u8 #foreign libsdl3;
 * thread.
 *
 * \returns the ID of the current thread.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -7506,6 +7544,8 @@ SDL_GetCurrentThreadID :: () -> SDL_ThreadID #foreign libsdl3;
 * \returns the ID of the specified thread, or the ID of the current thread if
 *          `thread` is NULL.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_GetCurrentThreadID
@@ -7522,6 +7562,8 @@ SDL_GetThreadID :: (thread: *SDL_Thread) -> SDL_ThreadID #foreign libsdl3;
 * \param priority the SDL_ThreadPriority to set.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -7555,6 +7597,9 @@ SDL_SetCurrentThreadPriority :: (priority: SDL_ThreadPriority) -> bool #foreign 
 *               function by its 'return', or -1 if the thread has been
 *               detached or isn't valid, may be NULL.
 *
+* \threadsafety It is safe to call this function from any thread, but only a
+*               single thread can wait any specific thread to finish.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_CreateThread
@@ -7568,6 +7613,8 @@ SDL_WaitThread :: (thread: *SDL_Thread, status: *s32) -> void #foreign libsdl3;
 * \param thread the thread to query.
 * \returns the current state of a thread, or SDL_THREAD_UNKNOWN if the thread
 *          isn't valid.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -7603,6 +7650,8 @@ SDL_GetThreadState :: (thread: *SDL_Thread) -> SDL_ThreadState #foreign libsdl3;
 *
 * \param thread the SDL_Thread pointer that was returned from the
 *               SDL_CreateThread() call that started this thread.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -7695,6 +7744,8 @@ SDL_Mutex :: struct {}
 * \returns the initialized and unlocked mutex or NULL on failure; call
 *          SDL_GetError() for more information.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_DestroyMutex
@@ -7721,6 +7772,8 @@ SDL_CreateMutex :: () -> *SDL_Mutex #foreign libsdl3;
 *
 * \param mutex the mutex to lock.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_TryLockMutex
@@ -7742,6 +7795,8 @@ SDL_LockMutex :: (mutex: *SDL_Mutex) -> void #foreign libsdl3;
 * \param mutex the mutex to try to lock.
 * \returns true on success, false if the mutex would block.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_LockMutex
@@ -7761,6 +7816,9 @@ SDL_TryLockMutex :: (mutex: *SDL_Mutex) -> bool #foreign libsdl3;
 *
 * \param mutex the mutex to unlock.
 *
+* \threadsafety This call must be paired with a previous locking call on the
+*               same thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_LockMutex
@@ -7778,6 +7836,8 @@ SDL_UnlockMutex :: (mutex: *SDL_Mutex) -> void #foreign libsdl3;
 * on the platform.
 *
 * \param mutex the mutex to destroy.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -7817,6 +7877,8 @@ SDL_RWLock :: struct {}
 *
 * \returns the initialized and unlocked read/write lock or NULL on failure;
 *          call SDL_GetError() for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -7858,6 +7920,8 @@ SDL_CreateRWLock :: () -> *SDL_RWLock #foreign libsdl3;
 *
 * \param rwlock the read/write lock to lock.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_LockRWLockForWriting
@@ -7889,6 +7953,8 @@ SDL_LockRWLockForReading :: (rwlock: *SDL_RWLock) -> void #foreign libsdl3;
 *
 * \param rwlock the read/write lock to lock.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_LockRWLockForReading
@@ -7913,6 +7979,8 @@ SDL_LockRWLockForWriting :: (rwlock: *SDL_RWLock) -> void #foreign libsdl3;
 *
 * \param rwlock the rwlock to try to lock.
 * \returns true on success, false if the lock would block.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -7944,6 +8012,8 @@ SDL_TryLockRWLockForReading :: (rwlock: *SDL_RWLock) -> bool #foreign libsdl3;
 * \param rwlock the rwlock to try to lock.
 * \returns true on success, false if the lock would block.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_LockRWLockForWriting
@@ -7968,6 +8038,9 @@ SDL_TryLockRWLockForWriting :: (rwlock: *SDL_RWLock) -> bool #foreign libsdl3;
 *
 * \param rwlock the rwlock to unlock.
 *
+* \threadsafety This call must be paired with a previous locking call on the
+*               same thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_LockRWLockForReading
@@ -7987,6 +8060,8 @@ SDL_UnlockRWLock :: (rwlock: *SDL_RWLock) -> void #foreign libsdl3;
 * undefined behavior depending on the platform.
 *
 * \param rwlock the rwlock to destroy.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -8009,6 +8084,8 @@ SDL_Semaphore :: struct {}
 * \returns a new semaphore or NULL on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_DestroySemaphore
@@ -8028,6 +8105,8 @@ SDL_CreateSemaphore :: (initial_value: Uint32) -> *SDL_Semaphore #foreign libsdl
 *
 * \param sem the semaphore to destroy.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_CreateSemaphore
@@ -8045,6 +8124,8 @@ SDL_DestroySemaphore :: (sem: *SDL_Semaphore) -> void #foreign libsdl3;
 * a time length of -1.
 *
 * \param sem the semaphore wait on.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -8064,6 +8145,8 @@ SDL_WaitSemaphore :: (sem: *SDL_Semaphore) -> void #foreign libsdl3;
 *
 * \param sem the semaphore to wait on.
 * \returns true if the wait succeeds, false if the wait would block.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -8085,6 +8168,8 @@ SDL_TryWaitSemaphore :: (sem: *SDL_Semaphore) -> bool #foreign libsdl3;
 *                  indefinitely.
 * \returns true if the wait succeeds or false if the wait times out.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_SignalSemaphore
@@ -8097,6 +8182,8 @@ SDL_WaitSemaphoreTimeout :: (sem: *SDL_Semaphore, timeoutMS: Sint32) -> bool #fo
 * Atomically increment a semaphore's value and wake waiting threads.
 *
 * \param sem the semaphore to increment.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -8112,6 +8199,8 @@ SDL_SignalSemaphore :: (sem: *SDL_Semaphore) -> void #foreign libsdl3;
 * \param sem the semaphore to query.
 * \returns the current value of the semaphore.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_GetSemaphoreValue :: (sem: *SDL_Semaphore) -> Uint32 #foreign libsdl3;
@@ -8123,6 +8212,8 @@ SDL_Condition :: struct {}
 *
 * \returns a new condition variable or NULL on failure; call SDL_GetError()
 *          for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -8138,6 +8229,8 @@ SDL_CreateCondition :: () -> *SDL_Condition #foreign libsdl3;
 * Destroy a condition variable.
 *
 * \param cond the condition variable to destroy.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -10610,7 +10703,7 @@ SDL_GetAudioStreamOutputChannelMap :: (stream: *SDL_AudioStream, count: *s32) ->
 *
 * \since This function is available since SDL 3.2.0.
 *
-* \sa SDL_SetAudioStreamInputChannelMap
+* \sa SDL_SetAudioStreamOutputChannelMap
 */
 SDL_SetAudioStreamInputChannelMap :: (stream: *SDL_AudioStream, chmap: *s32, count: s32) -> bool #foreign libsdl3;
 
@@ -12872,6 +12965,8 @@ SDL_HasRectIntersection :: (A: *SDL_Rect, B: *SDL_Rect) -> bool #foreign libsdl3
 *               rectangles `A` and `B`.
 * \returns true if there is an intersection, false otherwise.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_HasRectIntersection
@@ -12887,6 +12982,8 @@ SDL_GetRectIntersection :: (A: *SDL_Rect, B: *SDL_Rect, result: *SDL_Rect) -> bo
 *               `A` and `B`.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -12906,6 +13003,8 @@ SDL_GetRectUnion :: (A: *SDL_Rect, B: *SDL_Rect, result: *SDL_Rect) -> bool #for
 *               rectangle.
 * \returns true if any points were enclosed or false if all the points were
 *          outside of the clipping rectangle.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -12927,6 +13026,8 @@ SDL_GetRectEnclosingPoints :: (points: *SDL_Point, count: s32, clip: *SDL_Rect, 
 * \param Y2 a pointer to the ending Y-coordinate of the line.
 * \returns true if there is an intersection, false otherwise.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_GetRectAndLineIntersection :: (rect: *SDL_Rect, X1: *s32, Y1: *s32, X2: *s32, Y2: *s32) -> bool #foreign libsdl3;
@@ -12940,9 +13041,11 @@ SDL_GetRectAndLineIntersection :: (rect: *SDL_Rect, X1: *s32, Y1: *s32, X2: *s32
 * \param B an SDL_FRect structure representing the second rectangle.
 * \returns true if there is an intersection, false otherwise.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
-* \sa SDL_GetRectIntersection
+* \sa SDL_GetRectIntersectionFloat
 */
 SDL_HasRectIntersectionFloat :: (A: *SDL_FRect, B: *SDL_FRect) -> bool #foreign libsdl3;
 
@@ -12956,6 +13059,8 @@ SDL_HasRectIntersectionFloat :: (A: *SDL_FRect, B: *SDL_FRect) -> bool #foreign 
 * \param result an SDL_FRect structure filled in with the intersection of
 *               rectangles `A` and `B`.
 * \returns true if there is an intersection, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -12972,6 +13077,8 @@ SDL_GetRectIntersectionFloat :: (A: *SDL_FRect, B: *SDL_FRect, result: *SDL_FRec
 *               `A` and `B`.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -12993,6 +13100,8 @@ SDL_GetRectUnionFloat :: (A: *SDL_FRect, B: *SDL_FRect, result: *SDL_FRect) -> b
 * \returns true if any points were enclosed or false if all the points were
 *          outside of the clipping rectangle.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_GetRectEnclosingPointsFloat :: (points: *SDL_FPoint, count: s32, clip: *SDL_FRect, result: *SDL_FRect) -> bool #foreign libsdl3;
@@ -13013,6 +13122,8 @@ SDL_GetRectEnclosingPointsFloat :: (points: *SDL_FPoint, count: s32, clip: *SDL_
 * \param X2 a pointer to the ending X-coordinate of the line.
 * \param Y2 a pointer to the ending Y-coordinate of the line.
 * \returns true if there is an intersection, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -19251,6 +19362,8 @@ SDL_PowerState :: enum s32 {
 *                is no battery.
 * \returns the current battery state or `SDL_POWERSTATE_ERROR` on failure;
 *          call SDL_GetError() for more information.
+*
+* \threadsafety This function is not thread safe.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -25702,15 +25815,13 @@ SDL_FlushEvents :: (minType: Uint32, maxType: Uint32) -> void #foreign libsdl3;
 * Poll for currently pending events.
 *
 * If `event` is not NULL, the next event is removed from the queue and stored
-* in the SDL_Event structure pointed to by `event`. The 1 returned refers to
-* this event, immediately stored in the SDL Event structure -- not an event
-* to follow.
+* in the SDL_Event structure pointed to by `event`.
 *
-* If `event` is NULL, it simply returns 1 if there is an event in the queue,
-* but will not remove it from the queue.
+* If `event` is NULL, it simply returns true if there is an event in the
+* queue, but will not remove it from the queue.
 *
 * As this function may implicitly call SDL_PumpEvents(), you can only call
-* this function in the thread that set the video mode.
+* this function in the thread that initialized the video subsystem.
 *
 * SDL_PollEvent() is the favored way of receiving system events since it can
 * be done from the main loop and does not suspend the main loop while waiting
@@ -26280,9 +26391,8 @@ SDL_GetUserFolder :: (folder: SDL_Folder) -> *u8 #foreign libsdl3;
 /**
 * Types of filesystem entries.
 *
-* Note that there may be other sorts of items on a filesystem: devices,
-* symlinks, named pipes, etc. They are currently reported as
-* SDL_PATHTYPE_OTHER.
+* Note that there may be other sorts of items on a filesystem: devices, named
+* pipes, etc. They are currently reported as SDL_PATHTYPE_OTHER.
 *
 * \since This enum is available since SDL 3.2.0.
 *
@@ -26499,6 +26609,10 @@ SDL_CopyFile :: (oldpath: *u8, newpath: *u8) -> bool #foreign libsdl3;
 
 /**
 * Get information about a filesystem path.
+*
+* Symlinks, on filesystems that support them, are always followed, so you
+* will always get information on what the symlink eventually points to, and
+* not the symlink itself.
 *
 * \param path the path to query.
 * \param info a pointer filled in with information about the path, or NULL to
@@ -27607,11 +27721,12 @@ SDL_GPUViewport :: struct {
 * SDL_DownloadFromGPUTexture are used as default values respectively and data
 * is considered to be tightly packed.
 *
-* **WARNING**: Direct3D 12 requires texture data row pitch to be 256 byte
-* aligned, and offsets to be aligned to 512 bytes. If they are not, SDL will
-* make a temporary copy of the data that is properly aligned, but this adds
-* overhead to the transfer process. Apps can avoid this by aligning their
-* data appropriately, or using a different GPU backend than Direct3D 12.
+* **WARNING**: On some older/integrated hardware, Direct3D 12 requires
+* texture data row pitch to be 256 byte aligned, and offsets to be aligned to
+* 512 bytes. If they are not, SDL will make a temporary copy of the data that
+* is properly aligned, but this adds overhead to the transfer process. Apps
+* can avoid this by aligning their data appropriately, or using a different
+* GPU backend than Direct3D 12.
 *
 * \since This struct is available since SDL 3.2.0.
 *
@@ -28465,6 +28580,21 @@ SDL_CreateGPUDevice :: (format_flags: SDL_GPUShaderFormat, debug_mode: bool, nam
 *   useful for targeting Intel Haswell and Broadwell GPUs; other hardware
 *   either supports Tier 2 Resource Binding or does not support D3D12 in any
 *   capacity. Defaults to false.
+* - `SDL_PROP_GPU_DEVICE_CREATE_D3D12_AGILITY_SDK_VERSION_NUMBER`: Certain
+*   feature checks are only possible on Windows 11 by default. By setting
+*   this alongside `SDL_PROP_GPU_DEVICE_CREATE_D3D12_AGILITY_SDK_PATH_STRING`
+*   and vendoring D3D12Core.dll from the D3D12 Agility SDK, you can make
+*   those feature checks possible on older platforms. The version you provide
+*   must match the one given in the DLL.
+* - `SDL_PROP_GPU_DEVICE_CREATE_D3D12_AGILITY_SDK_PATH_STRING`: Certain
+*   feature checks are only possible on Windows 11 by default. By setting
+*   this alongside
+*   `SDL_PROP_GPU_DEVICE_CREATE_D3D12_AGILITY_SDK_VERSION_NUMBER` and
+*   vendoring D3D12Core.dll from the D3D12 Agility SDK, you can make those
+*   feature checks possible on older platforms. The path you provide must be
+*   relative to the executable path of your app. Be sure not to put the DLL
+*   in the same directory as the exe; Microsoft strongly advises against
+*   this!
 *
 * With the Vulkan backend:
 *
@@ -28479,6 +28609,15 @@ SDL_CreateGPUDevice :: (format_flags: SDL_GPUShaderFormat, debug_mode: bool, nam
 *   This allows configuring a variety of Vulkan-specific options such as
 *   increasing the API version and opting into extensions aside from the
 *   minimal set SDL requires.
+*
+* With the Metal backend: -
+* `SDL_PROP_GPU_DEVICE_CREATE_METAL_ALLOW_MACFAMILY1_BOOLEAN`: By default,
+* macOS support requires what Apple calls "MTLGPUFamilyMac2" hardware or
+* newer. However, an application can set this property to true to enable
+* support for "MTLGPUFamilyMac1" hardware, if (and only if) the application
+* does not write to sRGB textures. (For history's sake: MacFamily1 also does
+* not support indirect command buffers, MSAA depth resolve, and stencil
+* resolve/feedback, but these are not exposed features in SDL_GPU.)
 *
 * \param props the properties to use.
 * \returns a GPU context on success or NULL on failure; call SDL_GetError()
@@ -31306,7 +31445,7 @@ SDL_ResumeHaptic :: (haptic: *SDL_Haptic) -> bool #foreign libsdl3;
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_RunHapticEffect
-* \sa SDL_StopHapticEffects
+* \sa SDL_StopHapticEffect
 */
 SDL_StopHapticEffects :: (haptic: *SDL_Haptic) -> bool #foreign libsdl3;
 
@@ -31456,9 +31595,9 @@ SDL_hid_device_info :: struct {
 * Initialize the HIDAPI library.
 *
 * This function initializes the HIDAPI library. Calling it is not strictly
-* necessary, as it will be called automatically by SDL_hid_enumerate(),
-* SDL_hid_open(), and SDL_hid_open_path() if needed. This function should be
-* called at the beginning of execution however, if there is a chance of
+* necessary, as it will be called automatically by SDL_hid_enumerate() and
+* any of the SDL_hid_open_*() functions if it is needed. This function should
+* be called at the beginning of execution however, if there is a chance of
 * HIDAPI handles being opened by different threads simultaneously.
 *
 * Each call to this function should have a matching call to SDL_hid_exit()
@@ -32182,6 +32321,8 @@ SDL_AppQuit_func :: #type (appstate: *void, result: SDL_AppResult) -> void #c_ca
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_SetAppMetadata
@@ -32202,6 +32343,8 @@ SDL_Init :: (flags: SDL_InitFlags) -> bool #foreign libsdl3;
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_Init
@@ -32218,6 +32361,8 @@ SDL_InitSubSystem :: (flags: SDL_InitFlags) -> bool #foreign libsdl3;
 *
 * \param flags any of the flags used by SDL_Init(); see SDL_Init for details.
 *
+* \threadsafety This function is not thread safe.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_InitSubSystem
@@ -32231,6 +32376,8 @@ SDL_QuitSubSystem :: (flags: SDL_InitFlags) -> void #foreign libsdl3;
 * \param flags any of the flags used by SDL_Init(); see SDL_Init for details.
 * \returns a mask of all initialized subsystems if `flags` is 0, otherwise it
 *          returns the initialization status of the specified subsystems.
+*
+* \threadsafety This function is not thread safe.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -32249,6 +32396,8 @@ SDL_WasInit :: (flags: SDL_InitFlags) -> SDL_InitFlags #foreign libsdl3;
 * You can use this function with atexit() to ensure that it is run when your
 * application is shutdown, but it is not wise to do this from a library or
 * other dynamically loaded code.
+*
+* \threadsafety This function should only be called on the main thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -32555,6 +32704,8 @@ SDL_Locale :: struct {
 *          call SDL_GetError() for more information. This is a single
 *          allocation that should be freed with SDL_free() when it is no
 *          longer needed.
+*
+* \threadsafety This function is not thread safe.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -33034,7 +33185,8 @@ SDL_LogOutputFunction :: #type (userdata: *void, category: s32, priority: SDL_Lo
 /**
 * Get the default log output function.
 *
-* \returns the default log output callback.
+* \returns the default log output callback. It should be called with NULL for
+*          the userdata argument.
 *
 * \threadsafety It is safe to call this function from any thread.
 *
@@ -33191,6 +33343,8 @@ SDL_MessageBoxData :: struct {
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_ShowSimpleMessageBox
@@ -33233,6 +33387,8 @@ SDL_ShowMessageBox :: (messageboxdata: *SDL_MessageBoxData, buttonid: *s32) -> b
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_ShowMessageBox
@@ -33259,6 +33415,8 @@ SDL_MetalView :: *void;
 * \param window the window.
 * \returns handle NSView or UIView.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_Metal_DestroyView
@@ -33274,6 +33432,8 @@ SDL_Metal_CreateView :: (window: *SDL_Window) -> SDL_MetalView #foreign libsdl3;
 *
 * \param view the SDL_MetalView object.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_Metal_CreateView
@@ -33285,6 +33445,8 @@ SDL_Metal_DestroyView :: (view: SDL_MetalView) -> void #foreign libsdl3;
 *
 * \param view the SDL_MetalView object.
 * \returns a pointer.
+*
+* \threadsafety This function should only be called on the main thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -33317,6 +33479,8 @@ SDL_Metal_GetLayer :: (view: SDL_MetalView) -> *void #foreign libsdl3;
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_OpenURL :: (url: *u8) -> bool #foreign libsdl3;
@@ -33334,6 +33498,8 @@ SDL_OpenURL :: (url: *u8) -> bool #foreign libsdl3;
 *
 * \returns the name of the platform. If the correct platform name is not
 *          available, returns a string beginning with the text "Unknown".
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -34322,8 +34488,6 @@ SDL_CreateTextureFromSurface :: (renderer: *SDL_Renderer, surface: *SDL_Surface)
 *
 * With the opengles2 renderer:
 *
-* - `SDL_PROP_TEXTURE_CREATE_OPENGLES2_TEXTURE_NUMBER`: the GLuint texture
-*   associated with the texture, if you want to wrap an existing texture.
 * - `SDL_PROP_TEXTURE_CREATE_OPENGLES2_TEXTURE_NUMBER`: the GLuint texture
 *   associated with the texture, if you want to wrap an existing texture.
 * - `SDL_PROP_TEXTURE_CREATE_OPENGLES2_TEXTURE_UV_NUMBER`: the GLuint texture
@@ -35993,6 +36157,8 @@ SDL_RenderGeometryRaw :: (renderer: *SDL_Renderer, texture: *SDL_Texture, xy: *f
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.4.0.
 *
 * \sa SDL_RenderGeometry
@@ -36013,6 +36179,8 @@ SDL_SetRenderTextureAddressMode :: (renderer: *SDL_Renderer, u_mode: SDL_Texture
 *               be NULL.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety This function should only be called on the main thread.
 *
 * \since This function is available since SDL 3.4.0.
 *
@@ -36776,7 +36944,7 @@ SDL_EnumerateStorageDirectory :: (storage: *SDL_Storage, path: *u8, callback: SD
 * Remove a file or an empty directory in a writable storage container.
 *
 * \param storage a storage container.
-* \param path the path of the directory to enumerate.
+* \param path the path to remove from the filesystem.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
@@ -36920,6 +37088,8 @@ SDL_X11EventHook :: #type (userdata: *void, xevent: *XEvent) -> bool #c_call;
 * \param callback the SDL_X11EventHook function to call.
 * \param userdata a pointer to pass to every iteration of `callback`.
 *
+* \threadsafety This function should only be called on the main thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_SetX11EventHook :: (callback: SDL_X11EventHook, userdata: *void) -> void #foreign libsdl3;
@@ -36931,6 +37101,8 @@ SDL_SetX11EventHook :: (callback: SDL_X11EventHook, userdata: *void) -> void #fo
 *
 * \returns true if the device is a tablet, false otherwise.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_IsTablet :: () -> bool #foreign libsdl3;
@@ -36941,6 +37113,8 @@ SDL_IsTablet :: () -> bool #foreign libsdl3;
 * If SDL can't determine this, it will return false.
 *
 * \returns true if the device is a TV, false otherwise.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -37142,6 +37316,8 @@ SDL_TimeFormat :: enum u32 {
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety This function is not thread safe.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_GetDateTimeLocalePreferences :: (dateFormat: *SDL_DateFormat, timeFormat: *SDL_TimeFormat) -> bool #foreign libsdl3;
@@ -37153,6 +37329,8 @@ SDL_GetDateTimeLocalePreferences :: (dateFormat: *SDL_DateFormat, timeFormat: *S
 * \param ticks the SDL_Time to hold the returned tick count.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -37170,6 +37348,8 @@ SDL_GetCurrentTime :: (ticks: *SDL_Time) -> bool #foreign libsdl3;
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_TimeToDateTime :: (ticks: SDL_Time, dt: *SDL_DateTime, localTime: bool) -> bool #foreign libsdl3;
@@ -37184,6 +37364,8 @@ SDL_TimeToDateTime :: (ticks: SDL_Time, dt: *SDL_DateTime, localTime: bool) -> b
 * \param ticks the resulting SDL_Time.
 * \returns true on success or false on failure; call SDL_GetError() for more
 *          information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -37201,6 +37383,8 @@ SDL_DateTimeToTime :: (dt: *SDL_DateTime, ticks: *SDL_Time) -> bool #foreign lib
 * \param dwHighDateTime a pointer filled in with the high portion of the
 *                       Windows FILETIME value.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_TimeToWindows :: (ticks: SDL_Time, dwLowDateTime: *Uint32, dwHighDateTime: *Uint32) -> void #foreign libsdl3;
@@ -37216,6 +37400,8 @@ SDL_TimeToWindows :: (ticks: SDL_Time, dwLowDateTime: *Uint32, dwHighDateTime: *
 * \param dwHighDateTime the high portion of the Windows FILETIME value.
 * \returns the converted SDL time.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_TimeFromWindows :: (dwLowDateTime: Uint32, dwHighDateTime: Uint32) -> SDL_Time #foreign libsdl3;
@@ -37227,6 +37413,8 @@ SDL_TimeFromWindows :: (dwLowDateTime: Uint32, dwHighDateTime: Uint32) -> SDL_Ti
 * \param month the month [1-12].
 * \returns the number of days in the requested month or -1 on failure; call
 *          SDL_GetError() for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -37241,6 +37429,8 @@ SDL_GetDaysInMonth :: (year: s32, month: s32) -> s32 #foreign libsdl3;
 * \returns the day of year [0-365] if the date is valid or -1 on failure;
 *          call SDL_GetError() for more information.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 */
 SDL_GetDayOfYear :: (year: s32, month: s32, day: s32) -> s32 #foreign libsdl3;
@@ -37253,6 +37443,8 @@ SDL_GetDayOfYear :: (year: s32, month: s32, day: s32) -> s32 #foreign libsdl3;
 * \param day the day component of the date.
 * \returns a value between 0 and 6 (0 being Sunday) if the date is valid or
 *          -1 on failure; call SDL_GetError() for more information.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 */
@@ -38001,6 +38193,8 @@ SDL_UpdateTrays :: () -> void #foreign libsdl3;
 *
 * \returns the version of the linked library.
 *
+* \threadsafety It is safe to call this function from any thread.
+*
 * \since This function is available since SDL 3.2.0.
 *
 * \sa SDL_GetRevision
@@ -38027,6 +38221,8 @@ SDL_GetVersion :: () -> s32 #foreign libsdl3;
 *
 * \returns an arbitrary string, uniquely identifying the exact revision of
 *          the SDL library in use.
+*
+* \threadsafety It is safe to call this function from any thread.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -38055,6 +38251,8 @@ SDL_main_func :: #type (argc: s32, argv: **u8) -> s32 #c_call;
 * redefine main() as SDL_main(). Thus to ensure that your main() function
 * will not be changed it is necessary to define SDL_MAIN_HANDLED before
 * including SDL.h.
+*
+* \threadsafety This function is not thread safe.
 *
 * \since This function is available since SDL 3.2.0.
 *
@@ -38125,19 +38323,31 @@ SDL_EnterAppMainCallbacks :: (argc: s32, argv: **u8, appinit: SDL_AppInit_func, 
 /**
 * Callback from the application to let the suspend continue.
 *
+* This should be called from an event watch in response to an
+* `SDL_EVENT_DID_ENTER_BACKGROUND` event.
+*
+* When using SDL_Render, your event watch should be added _after_ creating
+* the `SDL_Renderer`; this allows the timing of the D3D12 command queue
+* suspension to execute in the correct order.
+*
+* When using SDL_GPU, this should be called after calling SDL_GDKSuspendGPU.
+*
+* If you're writing your own D3D12 renderer, this should be called after
+* calling `ID3D12CommandQueue::SuspendX`.
+*
 * This function is only needed for Xbox GDK support; all other platforms will
 * do nothing and set an "unsupported" error message.
 *
+* \threadsafety This function is not thread safe.
+*
 * \since This function is available since SDL 3.2.0.
+*
+* \sa SDL_AddEventWatch
 */
 SDL_GDKSuspendComplete :: () -> void #foreign libsdl3;
 
 #scope_file
 
-#import "Basic"; // For push_context
+#import "Basic"; // For print_to_builder
 
-#if CPU == .X64 {
-    libsdl3 :: #library "bin/x64/libSDL3.0_dynamic";
-} else #if CPU == .ARM64 {
-    libsdl3 :: #library "bin/arm64/libSDL3.0_dynamic";
-}
+libsdl3 :: #library "libSDL3";

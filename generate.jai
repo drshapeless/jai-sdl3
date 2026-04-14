@@ -10,10 +10,51 @@ ttf    := false;
     vulkan = array_find(args, "vulkan");
     image  = array_find(args, "image");
     ttf    = array_find(args, "ttf");
+    update := array_find(args, "update");
+
+    if update {
+        update_headers();
+        return;
+    }
+
+    copy_dynamic_libraries();
 
     if !generate_bindings() {
         compiler_set_workspace_status(.FAILED);
         return;
+    }
+}
+
+copy_dynamic_libraries :: () {
+    #if OS == .MACOS {
+        copy_file("/opt/homebrew/lib/libSDL3.dylib", "macos/libSDL3.dylib");
+        if image {
+            copy_file("/opt/homebrew/lib/lib_SDL3_image.dylib", "macos/libSDL3_image.dylib");
+        }
+        if ttf {
+            copy_file("/opt/homebrew/lib/lib_SDL3_ttf.dylib", "macos/libSDL3_ttf.dylib");
+        }
+    }
+}
+
+update_headers :: () {
+    make_directory_if_it_does_not_exist("include");
+    #if OS == .MACOS {
+        delete_directory("include/SDL3");
+        make_directory_if_it_does_not_exist("include/SDL3");
+        copy_directory("/opt/homebrew/include/SDL3", "include/SDL3");
+
+        if image {
+            delete_directory("include/SDL3_image");
+            make_directory_if_it_does_not_exist("include/SDL3_image");
+            copy_directory("/opt/homebrew/include/SDL3_image", "include/SDL3_image");
+        }
+
+        if ttf {
+            delete_directory("include/SDL3_ttf");
+            make_directory_if_it_does_not_exist("include/SDL3_ttf");
+            copy_directory("/opt/homebrew/include/SDL3_ttf", "include/SDL3_ttf");
+        }
     }
 }
 
@@ -59,16 +100,16 @@ EOF;
         output_filename = "macos/macos.jai";
 
         FOOTER :: #string EOF
-libsdl3 :: #library,system "libSDL3";
+libsdl3 :: #library "libSDL3";
 EOF;
         FOOTER_IMAGE :: #string EOF
-libsdl3_image :: #library,system "libSDL3_image";
+libsdl3_image :: #library "libSDL3_image";
 EOF;
         FOOTER_TTF   :: #string EOF
-libsdl3_ttf :: #library,system "libSDL3_ttf";
+libsdl3_ttf :: #library "libSDL3_ttf";
 EOF;
 
-        array_add(*opts.library_search_paths, "/opt/homebrew/lib");
+        array_add(*opts.library_search_paths, "macos");
 
         opts.footer = FOOTER;
 
@@ -178,6 +219,7 @@ sdl3_visitor :: (decl: *Declaration, parent_decl: *Declaration) -> Declaration_V
 #import "Check";
 #import "Bindings_Generator";
 #import "File";
+#import "File_Utilities";
 #import "String";
 
 DECLARATIONS_TO_OMIT :: string.[
