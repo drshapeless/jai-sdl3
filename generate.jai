@@ -34,27 +34,40 @@ copy_dynamic_libraries :: () {
         if ttf {
             copy_file("/opt/homebrew/lib/lib_SDL3_ttf.dylib", "macos/libSDL3_ttf.dylib");
         }
+    } else if OS == .LINUX {
+        copy_file("/usr/lib64/libSDL3.so.0", "linux/libSDL3.so");
+        if image {
+            copy_file("/usr/lib64/libSDL3_image.so.0", "linux/libSDL3_image.so");
+        }
+        if ttf {
+            copy_file("/usr/lib64/libSDL3_ttf.so.0", "linux/libSDL3_ttf.so");
+        }
     }
 }
 
 update_headers :: () {
     make_directory_if_it_does_not_exist("include");
+    system_include_prefix: string;
     #if OS == .MACOS {
-        delete_directory("include/SDL3");
-        make_directory_if_it_does_not_exist("include/SDL3");
-        copy_directory("/opt/homebrew/include/SDL3", "include/SDL3");
+        system_include_prefix = "/opt/homebrew/include";
+    } else #if OS == .LINUX {
+        system_include_prefix = "/usr/include";
+    }
 
-        if image {
-            delete_directory("include/SDL3_image");
-            make_directory_if_it_does_not_exist("include/SDL3_image");
-            copy_directory("/opt/homebrew/include/SDL3_image", "include/SDL3_image");
-        }
+    delete_directory("include/SDL3");
+    make_directory_if_it_does_not_exist("include/SDL3");
+    copy_directory(tprint("%/SDL3", system_include_prefix), "include/SDL3");
 
-        if ttf {
-            delete_directory("include/SDL3_ttf");
-            make_directory_if_it_does_not_exist("include/SDL3_ttf");
-            copy_directory("/opt/homebrew/include/SDL3_ttf", "include/SDL3_ttf");
-        }
+    if image {
+        delete_directory("include/SDL3_image");
+        make_directory_if_it_does_not_exist("include/SDL3_image");
+        copy_directory(tprint("%/SDL3_image", system_include_prefix), "include/SDL3_image");
+    }
+
+    if ttf {
+        delete_directory("include/SDL3_ttf");
+        make_directory_if_it_does_not_exist("include/SDL3_ttf");
+        copy_directory(tprint("%/SDL3_ttf", system_include_prefix), "include/SDL3_ttf");
     }
 }
 
@@ -67,13 +80,13 @@ generate_bindings :: () -> bool {
         output_filename = "linux/linux.jai";
 
         FOOTER :: #string EOF
-libsdl3 :: #library,system "libSDL3.so.0";
+libsdl3 :: #library "libSDL3";
 EOF;
         FOOTER_IMAGE :: #string EOF
-libsdl3_image :: #library,system "libSDL3_image.so.0";
+libsdl3_image :: #library "libSDL3_image";
 EOF;
         FOOTER_TTF   :: #string EOF
-libsdl3_ttf :: #library,system "libSDL3_ttf.so.0";
+libsdl3_ttf :: #library "libSDL3_ttf";
 EOF;
 
         opts.footer = FOOTER;
@@ -87,7 +100,7 @@ EOF;
         }
 
         opts.generate_library_declarations = false;
-
+        array_add(*opts.library_search_paths, "linux");
         array_add(*opts.libraries, .{filename="libSDL3.so.0"});
         if image {
             array_add(*opts.libraries, .{filename="libSDL3_image.so.0"});
